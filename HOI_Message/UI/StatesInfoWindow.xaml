@@ -1,0 +1,21 @@
+﻿<hc:Window
+    x:Class="HOI_Message.UI.StatesInfoWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:HOI_Message.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:HOI_Message.ViewModels"
+    Title="StatesMessage"
+    Width="800"
+    Height="750"
+    mc:Ignorable="d">
+
+    <UserControl xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF">
+        <lvc:PieChart
+            x:Name="StatesPieChart"
+            LegendPosition="Right"
+            Series="{Binding Series}" />
+    </UserControl>
+</hc:Window>

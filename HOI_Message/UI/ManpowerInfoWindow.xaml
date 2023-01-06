@@ -1,0 +1,21 @@
+﻿<hc:Window
+    x:Class="HOI_Message.UI.ManpowerInfoWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:HOI_Message.UI"
+    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:HOI_Message.ViewModels"
+    Title="ManpowerInfo"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+    <UserControl>
+        <lvc:PieChart
+            x:Name="ManpowerPieChart"
+            LegendPosition="Right"
+            Series="{Binding Series}" />
+    </UserControl>
+</hc:Window>
