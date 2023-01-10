@@ -1,19 +1,14 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using HandyControl.Controls;
-using MessageBox = HandyControl.Controls.MessageBox;
-using HandyControl.Data;
-using HOI_Message.Logic;
-using HOI_Message.Logic.Country;
-using HOI_Message.UI;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.Messaging;
+using HandyControl.Controls;
+using HandyControl.Data;
+using HOI_Message.Logic;
 using HOI_Message.UI.OptionView;
-using System.Windows.Documents;
-using System.Windows.Media;
+using NLog;
 
 namespace HOI_Message;
 
@@ -30,11 +25,12 @@ public partial class SelectPathsWindow
 
         this.DataContext = new ViewModels.SelectPathsWindowViewModel();
         this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         ParseProgressBar.Visibility = Visibility.Hidden;
         ParseProgressMesaageShowLabel.Visibility = Visibility.Hidden;
         ParseItemNameShowLabel.Visibility = Visibility.Hidden;
         ParseProgressMesaageShowLabel.Content = string.Empty;
-       
+
         AddAllWeakReferenceMessenger();
     }
 
@@ -66,13 +62,7 @@ public partial class SelectPathsWindow
             _ = Dispatcher.Invoke(new Action<DependencyProperty, object>(this.ParseProgressBar.SetValue),
                     DispatcherPriority.Background, ProgressBar.ValueProperty, data.Item1);
             ParseProgressMesaageShowLabel.Content = $"{data.Item2.FullName} 处理完成";
-        });        
-    }    
-       
-    private void Button_Click_1(object sender, RoutedEventArgs e)
-    {
-        var win = new OptionWindow();
-        win.Show();
+        });
     }
 
     private void ShowSuccessTipMessage()

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HOI_Message.Logic
+﻿namespace HOI_Message.Logic
 {
+    /// <summary>
+    /// 事件ID, 用于 View 层与 View Model 层通信
+    /// </summary>
     public static class EventId
     {
         /// <summary>

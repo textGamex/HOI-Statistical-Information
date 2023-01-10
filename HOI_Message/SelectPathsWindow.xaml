@@ -79,27 +79,64 @@
             x:Name="ParseProgressBar"
             Width="550"
             Height="25"
-            Margin="0,352,0,0"
-            HorizontalAlignment="Center"
+            Margin="185,272,0,0"
+            HorizontalAlignment="Left"
             VerticalAlignment="Top" />
         <Label
             x:Name="ParseProgressMesaageShowLabel"
             Width="550"
-            Margin="0,317,0,0"
+            Margin="185,237,0,0"
+            HorizontalAlignment="Left"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Left"
             Content="Label" />
-        <Button
-            Width="156"
-            Margin="0,460,0,0"
-            VerticalAlignment="Top"
-            Click="Button_Click_1"
-            Content="Button" />
         <Label
             x:Name="ParseItemNameShowLabel"
             Width="190"
-            Margin="0,382,0,0"
-            VerticalAlignment="Top"
+            Margin="365,0,0,0"
+            HorizontalAlignment="Left"
             Content="{Binding ParseItemNumberLabel}" />
+        <Image
+            x:Name="CoverImage"
+            Width="150"
+            Height="140"
+            Margin="25,378,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Source="{Binding ImageSource}"
+            Stretch="UniformToFill" />
+        <hc:TextBox
+            x:Name="ModNameTextBox"
+            Width="220"
+            Margin="185,378,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            hc:InfoElement.Title="Mod名称"
+            hc:InfoElement.TitlePlacement="Left"
+            Style="{StaticResource TextBoxExtend}"
+            Text="{Binding ModName}"
+            TextWrapping="Wrap" />
+        <hc:TextBox
+            x:Name="ModVersionTextBox"
+            Width="220"
+            Margin="185,443,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            hc:InfoElement.Title="版本号"
+            hc:InfoElement.TitlePlacement="Left"
+            Style="{StaticResource TextBoxExtend}"
+            Text="{Binding ModVersion}"
+            TextWrapping="Wrap" />
+        <hc:TextBox
+            x:Name="ModTagsTextBox"
+            Width="220"
+            Margin="185,500,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            hc:InfoElement.Title="标签"
+            hc:InfoElement.TitlePlacement="Left"
+            Style="{StaticResource TextBoxExtend}"
+            Text="{Binding ModTags}"
+            TextWrapping="Wrap" />
     </Grid>
 </hc:Window>

@@ -13,12 +13,46 @@ using HOI_Message.Logic.State;
 using static HOI_Message.Logic.Localisation.LocalisationData;
 using MessageBox = HandyControl.Controls.MessageBox;
 using NLog;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Linq;
 
 namespace HOI_Message.ViewModels
 {
+
     public partial class SelectPathsWindowViewModel : ObservableObject
     {
-        private string? _modDescriptorPath = null;
+        [ObservableProperty]
+        private string gameRootPath = string.Empty;
+
+        [ObservableProperty]
+        private string localisationPath = string.Empty;
+
+        [ObservableProperty]
+        private string parseItemNumberLabel = string.Empty;
+
+        [ObservableProperty]
+        private ImageSource? imageSource;
+
+        [ObservableProperty]
+        private string modName = string.Empty;
+
+        [ObservableProperty]
+        private string modVersion = string.Empty;
+
+        [ObservableProperty]
+        private string modTags = string.Empty;
+
+        private readonly Dictionary<DataPaths, string> _dataPathMap = new(8);
+
+        private List<StateInfo>? _stateMessages = null;
+
+        private GameLocalisation _localisation = GameLocalisation.Empty;
+
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        //private string? _modDescriptorPath = null;
+
         private const string DescriptorName = "descriptor.mod";
 
         public SelectPathsWindowViewModel()
@@ -40,9 +74,17 @@ namespace HOI_Message.ViewModels
                 // 尝试查找mod配置文件
                 var descriptorPath = Path.Combine(GameRootPath, DescriptorName);
                 if (File.Exists(descriptorPath))
-                {
+                {                    
                     var descriptor = new Descriptor(descriptorPath);
-
+                    var picturePath = Path.Combine(GameRootPath, descriptor.PictureName);
+                    if (File.Exists(picturePath))
+                    {
+                        ImageSource = new BitmapImage(new Uri(picturePath, UriKind.Absolute));
+                    }
+                    
+                    ModName = descriptor.Name;
+                    ModVersion = descriptor.Version;
+                    ModTags = string.Join(", ", descriptor.Tags);
                 }
             }
             if (e.PropertyName == nameof(LocalisationPath))
@@ -51,22 +93,7 @@ namespace HOI_Message.ViewModels
             }
         }
 
-        [ObservableProperty]
-        public string gameRootPath = string.Empty;
 
-        [ObservableProperty]
-        public string localisationPath = string.Empty;
-
-        [ObservableProperty]
-        public string parseItemNumberLabel = string.Empty;
-
-        private readonly Dictionary<DataPaths, string> _dataPathMap = new(8);
-
-        private List<StateInfo>? _stateMessages = null;
-
-        private GameLocalisation _localisation = GameLocalisation.Empty;
-
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [RelayCommand]
         void StartParseButtonClick()

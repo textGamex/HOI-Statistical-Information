@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Random_HOI4.Logic.Util.CWTool;
-using SkiaSharp;
 
 namespace HOI_Message.Logic
 {
@@ -17,7 +13,7 @@ namespace HOI_Message.Logic
 
         public IEnumerable<string> Tags { get; } = Enumerable.Empty<string>();
 
-        public string Picture { get; } = string.Empty; 
+        public string PictureName { get; } = string.Empty;
 
         public Descriptor(string path)
         {
@@ -32,17 +28,17 @@ namespace HOI_Message.Logic
             {
                 if (item.Key == Key.Name)
                 {
-                    Name = item.Value.ToString();
+                    Name = item.Value.ToRawString();
                 }
 
                 if (item.Key == Key.Version)
                 {
-                    Version = item.Value.ToString();
+                    Version = item.Value.ToRawString();
                 }
 
                 if (item.Key == Key.Picture)
                 {
-                    Picture = item.Value.ToString();
+                    PictureName = item.Value.ToRawString();
                 }
             }
 

@@ -14,6 +14,7 @@ public class ResourcesWindowViewModel
     {
         var data = new ObservableCollection<ISeries>();
         uint count = 0;
+
         foreach (var country in countries.OrderByDescending(x => x.GetResourcesSum(resourcesType)))
         {
             ++count;
@@ -25,7 +26,9 @@ public class ResourcesWindowViewModel
                 {
                     point.PrimaryValue = message.GetResourcesSum(resourcesType);
                     point.SecondaryValue = point.Context.Entity.EntityIndex;
-                }
+                },
+                TooltipLabelFormatter =
+        (chartPoint) => $"{chartPoint.Context.Series.Name}: {chartPoint.PrimaryValue} ({chartPoint.StackedValue.Share:P2})",
             };
             data.Add(pieSeries);
         }
