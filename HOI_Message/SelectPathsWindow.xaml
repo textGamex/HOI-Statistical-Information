@@ -113,6 +113,7 @@
             VerticalAlignment="Top"
             hc:InfoElement.Title="Mod名称"
             hc:InfoElement.TitlePlacement="Left"
+            IsReadOnly="True"
             Style="{StaticResource TextBoxExtend}"
             Text="{Binding ModName}"
             TextWrapping="Wrap" />
@@ -124,6 +125,7 @@
             VerticalAlignment="Top"
             hc:InfoElement.Title="版本号"
             hc:InfoElement.TitlePlacement="Left"
+            IsReadOnly="True"
             Style="{StaticResource TextBoxExtend}"
             Text="{Binding ModVersion}"
             TextWrapping="Wrap" />
@@ -135,6 +137,7 @@
             VerticalAlignment="Top"
             hc:InfoElement.Title="标签"
             hc:InfoElement.TitlePlacement="Left"
+            IsReadOnly="True"
             Style="{StaticResource TextBoxExtend}"
             Text="{Binding ModTags}"
             TextWrapping="Wrap" />
