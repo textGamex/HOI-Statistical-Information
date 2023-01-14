@@ -17,6 +17,11 @@ public class ResourcesWindowViewModel
 
         foreach (var country in countries.OrderByDescending(x => x.GetResourcesSum(resourcesType)))
         {
+            if (country.GetResourcesSum(resourcesType) == 0)
+            {
+                continue;
+            }
+
             ++count;
             var pieSeries = new PieSeries<NationalInfo>
             {
