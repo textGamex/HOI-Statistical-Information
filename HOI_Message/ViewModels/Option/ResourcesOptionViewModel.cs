@@ -43,6 +43,11 @@ internal partial class ResourcesOptionViewModel : ObservableObject
     [RelayCommand]
     private void ClickStatrButton(ComboBoxItem comboBoxItem)
     {
+        if (comboBoxItem is null)
+        {
+            return;
+        }
+
         var typeName = (string)comboBoxItem.Content;
         string? typeKey = null;
 

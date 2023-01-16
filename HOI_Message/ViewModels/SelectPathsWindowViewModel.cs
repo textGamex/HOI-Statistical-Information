@@ -16,6 +16,7 @@ using NLog;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Linq;
+using HOI_Message.Logic.Unit;
 
 namespace HOI_Message.ViewModels
 {
@@ -121,6 +122,7 @@ namespace HOI_Message.ViewModels
             AddStateData(_dataPathMap[DataPaths.States]);
             AddLocalisationData(_dataPathMap[DataPaths.Localisation]);
             AddCountriesInfo(GameRootPath);
+            AddOOB();
 
             // 配置全局资源
             GameModels._countries = _nationalInfoList!;
@@ -195,6 +197,21 @@ namespace HOI_Message.ViewModels
                 }
 
                 _nationalInfoList.Add(nationalInfo);
+            }
+        }
+
+        private void AddOOB()
+        {
+            foreach (var item in _nationalInfoList)
+            {
+                var oobFilePath = Path.Combine(GameRootPath, "history", "units", item.OOBName);
+
+                if (!File.Exists(oobFilePath))
+                {
+                    item.UnitInfo = UnitInfo.Empty;
+                    continue;
+                }
+                item.UnitInfo = new UnitInfo(oobFilePath);
             }
         }
 

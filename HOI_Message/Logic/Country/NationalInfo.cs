@@ -18,12 +18,13 @@ public class NationalInfo
     public int OwnStatesNumber => _states.Count;
     public string OOBName { get; private set; }
     public byte ResearchSlotsNumber { get; private set; }
+    public int ConvoysNumber { get; private set; }
+    public UnitInfo UnitInfo { get; set; }    
 
     private readonly List<StateInfo> _states;
     private readonly Lazy<long> _manpower;
     private readonly Lazy<Dictionary<string, uint>> _buildings;
     private readonly Lazy<Dictionary<string, uint>> _resources;
-    private readonly UnitInfo _unitInfo;
 
     public NationalInfo(CountryFileParser parser, List<StateInfo> states, string? tag = null)
     {
@@ -49,6 +50,7 @@ public class NationalInfo
         _resources = new Lazy<Dictionary<string, uint>>(GetAllResourcesSumLazy);
         OOBName = parser.OOBName;
         ResearchSlotsNumber = parser.ResearchSlotsNumber;
+        ConvoysNumber = parser.ConvoysNumber;
 
         _states.TrimExcess();
     }
