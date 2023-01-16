@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 
 namespace HOI_Message.Logic.State;
 
+/// <summary>
+/// 地块信息
+/// </summary>
 public class StateInfo
 {
     public string OwnerTag { get; }
@@ -39,6 +42,7 @@ public class StateInfo
     }
 
     #region 散列码实现
+
     public override int GetHashCode()
     {
         return _hashCode.Value;
@@ -47,6 +51,7 @@ public class StateInfo
     private int GetHashCodeLazy()
     {
         var hash = new HashCode();
+
         hash.Add(Id);
         hash.Add(OwnerTag);
         hash.Add(Manpower);
@@ -77,7 +82,7 @@ public class StateInfo
         foreach (var key in map.Keys)
         {
             hashCode += (key == null ? 0 : key.GetHashCode()) ^
-            (map[key] == null ? 0 : map[key].GetHashCode());
+            (map[key] == null ? 0 : map[key]!.GetHashCode());
         }
         return hashCode;
     }

@@ -141,5 +141,11 @@
             Style="{StaticResource TextBoxExtend}"
             Text="{Binding ModTags}"
             TextWrapping="Wrap" />
+        <Button
+            Margin="555,458,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Click="Button_Click"
+            Content="Button" />
     </Grid>
 </hc:Window>

@@ -1,6 +1,6 @@
 ﻿using CWTools.Process;
 using NLog;
-using Random_HOI4.Logic.Util.CWTool;
+using HOI_Message.Logic.Util.CWTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +28,14 @@ internal class StateFileParser
 
     public StateFileParser(string path)
     {
-        if (CWToolsAdapter.TryParseFile(path, out var adapter))
+        var adapter = new CWToolsAdapter(path);
+        if (adapter.IsSuccess)
         {
             _root = adapter;
         }
         else
         {
-            throw new ArgumentException($"文件解析错误, 路径: {path}", nameof(path));
+            throw new ArgumentException($"文件解析错误, 路径: {path},错误信息:{adapter.ErrorMessage}", nameof(path));
         }
 
         if (_root.Root.Has(Key.State))

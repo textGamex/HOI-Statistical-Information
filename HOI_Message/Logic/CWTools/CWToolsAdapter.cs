@@ -9,57 +9,37 @@ using static FParsec.Error;
 using CWTools.CSharp;
 using CWTools.Process;
 using CWTools.Parser;
+using Microsoft.VisualBasic;
 
-namespace Random_HOI4.Logic.Util.CWTool
+namespace HOI_Message.Logic.Util.CWTool;
+
+/// <summary>
+/// CWTools的适配器.
+/// </summary>
+internal class CWToolsAdapter
 {
-    /// <summary>
-    /// CWTools的适配器.
-    /// </summary>
-    internal class CWToolsAdapter
+    public EventRoot Root { get; }
+    public bool IsSuccess { get; }
+
+    public string ErrorMessage { get; }
+
+    static CWToolsAdapter()
     {
-        public EventRoot Root { get; }
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    }
 
-        private CWToolsAdapter(EventRoot eventRoot)
+    public CWToolsAdapter(string filePath)
+    {
+        var result = parseEventFile(filePath);
+        if (result.IsSuccess)
         {
-            Root = eventRoot;
+            Root = processEventFile(result.GetResult());
         }
-
-        static CWToolsAdapter()
+        else
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Root = new EventRoot(string.Empty, null);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="contents"></param>
-        /// <param name="adapter"></param>
-        /// <returns>如果成功, 返回true, 否则返回false</returns>
-        public static bool TryParseString(string fileName, string contents, out CWToolsAdapter adapter)
-        {
-            var result = parseEventString(contents, fileName);
-            if (result.IsSuccess)
-                adapter = new CWToolsAdapter(processEventFile(result.GetResult()));
-            else
-                adapter = null;
-            return result.IsSuccess;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath">文件路径</param>
-        /// <param name="adapter"></param>
-        /// <returns>如果成功, 返回true, 否则返回false</returns>
-        public static bool TryParseFile(string filePath, out CWToolsAdapter adapter)
-        {
-            var result = parseEventFile(filePath);
-            if (result.IsSuccess)
-                adapter = new CWToolsAdapter(processEventFile(result.GetResult()));
-            else
-                adapter = null;
-            return result.IsSuccess;
-        }
+        IsSuccess = result.IsSuccess;
+        ErrorMessage = result.GetError();
     }
 }

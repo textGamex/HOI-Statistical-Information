@@ -1,100 +1,122 @@
-﻿using HOI_Message.Logic.State;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HOI_Message.Logic.State;
+using HOI_Message.Logic.Unit;
+using HOI_Message.Logic.Util.CWTool;
 
 namespace HOI_Message.Logic.Country;
 
+/// <summary>
+/// 保存着一个国家的所有信息
+/// </summary>
 public class NationalInfo
 {
-    public string Tag { get; }        
+    public string Tag { get; private set; }
     public long Manpower => _manpower.Value;
     public int OwnStatesNumber => _states.Count;
+    public string OOBName { get; private set; }
+    public byte ResearchSlotsNumber { get; private set; }
+
     private readonly List<StateInfo> _states;
     private readonly Lazy<long> _manpower;
     private readonly Lazy<Dictionary<string, uint>> _buildings;
     private readonly Lazy<Dictionary<string, uint>> _resources;
+    private readonly UnitInfo _unitInfo;
 
-    public NationalInfo(List<StateInfo> states)
+    public NationalInfo(CountryFileParser parser, List<StateInfo> states, string? tag = null)
     {
         _states = states ?? throw new ArgumentNullException(nameof(states));
-        Tag = states.First()?.OwnerTag ?? "NONE";
-        _states.TrimExcess();
+        if (tag is null)
+        {
+            if (_states.Count != 0)
+            {
+                Tag = _states.First().OwnerTag;
+            }
+            else
+            {
+                Tag = "NONE";
+            }
+        }
+        else
+        {
+            Tag = tag;
+        }
 
         _manpower = new Lazy<long>(_states.Sum(x => x.Manpower));
         _buildings = new Lazy<Dictionary<string, uint>>(GetAllBuildingsSumLazy);
         _resources = new Lazy<Dictionary<string, uint>>(GetAllResourcesSumLazy);
+        OOBName = parser.OOBName;
+        ResearchSlotsNumber = parser.ResearchSlotsNumber;
+
+        _states.TrimExcess();
+    }
+
+    public static IList<NationalInfo> ByFolderPath(string gameFolderPath, IEnumerable<StateInfo> states)
+    {
+        var nationalInfoList = new List<NationalInfo>();
+        var countriesTagsMap = GetAllCountriesTag(gameFolderPath);
+        var nationalStatesMap = ClassifyStates(states);
+
+        NationalInfo nationalInfo;
+        var emptyStatesList = new List<StateInfo>();
+
+        foreach (var item in countriesTagsMap)
+        {
+            if (!CountryFileParser.TryParseFile(item.Value, out var parser, out _))
+            {
+                throw new Exception();
+            }
+            if (nationalStatesMap.TryGetValue(item.Key, out var countryOwnStates))
+            {
+                nationalInfo = new NationalInfo(parser!, countryOwnStates, item.Key);
+            }
+            else
+            {
+                nationalInfo = new NationalInfo(parser!, emptyStatesList, item.Key);
+            }               
+
+            nationalInfoList.Add(nationalInfo);
+        }
+
+        return nationalInfoList;
     }
 
     /// <summary>
-    /// 根据<see cref="StateInfo"/>所属国家分类
+    /// 按地区控制国家进行分类
     /// </summary>
     /// <param name="states"></param>
-    /// <returns></returns>
+    /// <returns>Key是国家 Tag, Value是国家控制的地块集合</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static List<NationalInfo> ByStates(IList<StateInfo> states)
+    public static Dictionary<string, List<StateInfo>> ClassifyStates(IEnumerable<StateInfo> states)
     {
-        if (states is null)
-        {
-            throw new ArgumentNullException(nameof(states));
-        }
-
-        var map = new Dictionary<string, List<StateInfo>>(states.Count);
-        var nationalMessage = new List<NationalInfo>();
+        var map = new Dictionary<string, List<StateInfo>>(128);
 
         foreach (var state in states)
         {
-            if (map.TryGetValue(state.OwnerTag, out List<StateInfo> message))
+            if (map.TryGetValue(state.OwnerTag, out var message))
             {
                 message.Add(state);
             }
             else
             {
-                var list = new List<StateInfo>() { state };
+                var list = new List<StateInfo>(16) { state };
                 map.Add(state.OwnerTag, list);
             }
         }
-        foreach (var item in map.Values)
-        {
-            nationalMessage.Add(new NationalInfo(item));
-        }
-        return nationalMessage;
-    }
 
-    public static List<NationalInfo> ByFolderPath(string folderPath)
-    {
-        var files = new DirectoryInfo(folderPath).GetFiles();
-        var states = new List<StateInfo>(files.Length);
-        foreach (var file in files)
-        {
-            states.Add(new StateInfo(file.FullName));
-        }
-        return ByStates(states);
+        return map;
     }
 
     public uint GetBuildingsSum(string buildingsType)
     {
-        if (_buildings.Value.TryGetValue(buildingsType, out uint vaule))
-        {
-            return vaule;
-        }
-        else
-        {
-            return 0;
-        }
+        return _buildings.Value.TryGetValue(buildingsType, out uint vaule) ? vaule : 0;
     }
 
     public uint GetResourcesSum(string resourcesType)
     {
-        if (_resources.Value.TryGetValue(resourcesType, out uint vaule))
-        {
-            return vaule;
-        }
-        else
-        {
-            return 0;
-        }
+        return _resources.Value.TryGetValue(resourcesType, out uint vaule) ? vaule : 0;
     }
 
     public IList<string> GetAllResourcesTypes()
@@ -119,6 +141,8 @@ public class NationalInfo
                 }
             }
         }
+
+        map.TrimExcess();
         return map;
     }
 
@@ -139,6 +163,29 @@ public class NationalInfo
                 }
             }
         }
+
+        map.TrimExcess();
+        return map;
+    }
+
+    /// <summary>
+    /// 获得游戏内所有国家的 Tag 和对应的文件绝对路径
+    /// </summary>
+    /// <param name="gameRootPath">游戏根目录</param>
+    /// <returns>Key是国家Tag, Value是国家文件绝对路径</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static Dictionary<string, string> GetAllCountriesTag(string gameRootPath)
+    {
+        string folderPath = Path.Combine(gameRootPath, "history", "countries");
+        var map = new Dictionary<string, string>(128);
+        var files = new DirectoryInfo(folderPath).GetFiles(".", SearchOption.AllDirectories);
+
+        foreach (var file in files)
+        {
+            var countryTag = file.Name[0..3];
+            map[countryTag] = file.FullName;
+        }
+
         return map;
     }
 }

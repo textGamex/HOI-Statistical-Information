@@ -45,11 +45,14 @@ namespace HOI_Message.ViewModels
 
         private readonly Dictionary<DataPaths, string> _dataPathMap = new(8);
 
-        private List<StateInfo>? _stateMessages = null;
+        private List<StateInfo>? _statesInfo = null;
 
         private GameLocalisation _localisation = GameLocalisation.Empty;
 
+        private readonly List<NationalInfo> _nationalInfoList = new();
+
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
 
         //private string? _modDescriptorPath = null;
 
@@ -117,8 +120,10 @@ namespace HOI_Message.ViewModels
 
             AddStateData(_dataPathMap[DataPaths.States]);
             AddLocalisationData(_dataPathMap[DataPaths.Localisation]);
+            AddCountriesInfo(GameRootPath);
 
-            GameModels._countries = NationalInfo.ByStates(_stateMessages!);
+            // 配置全局资源
+            GameModels._countries = _nationalInfoList!;
             GameModels.Localisation = _localisation;
             WeakReferenceMessenger.Default.Send(string.Empty, EventId.ParseDataSuccess);
         }
@@ -127,16 +132,16 @@ namespace HOI_Message.ViewModels
         {
             var dir = new DirectoryInfo(folderPath);
             var files = dir.GetFiles();
-            _stateMessages = new List<StateInfo>(files.Length);
+            _statesInfo = new List<StateInfo>(files.Length);
 
             foreach (var file in files)
             {
-                _stateMessages.Add(new StateInfo(file.FullName));
+                _statesInfo.Add(new StateInfo(file.FullName));
 
                 //刷新进度条
-                double progressBarValue = (_stateMessages.Count / (double)files.Length) * 100;
-                WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file), EventId.UpdateParseProgressBar);
-                ParseItemNumberLabel = $"{_stateMessages.Count} / {files.Length}";
+                double progressBarValue = (_statesInfo.Count / (double)files.Length) * 100;
+                WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file.FullName), EventId.UpdateParseProgressBar);
+                ParseItemNumberLabel = $"{_statesInfo.Count} / {files.Length}";
             }
         }
 
@@ -153,12 +158,45 @@ namespace HOI_Message.ViewModels
 
                 //刷新进度条
                 double progressBarValue = (count / (double)files.Length) * 100;
-                WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file), EventId.UpdateParseProgressBar);
+                WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file.FullName), EventId.UpdateParseProgressBar);
                 ParseItemNumberLabel = $"{count} / {files.Length}";
             }
             _localisation = new GameLocalisation(map);
         }
 
+        private void AddCountriesInfo(string gameRootPath)
+        {
+            var countriesTagsMap = NationalInfo.GetAllCountriesTag(gameRootPath);
+            var nationalStatesMap = NationalInfo.ClassifyStates(_statesInfo ?? throw new Exception());
+            uint count = 0;
+
+            NationalInfo nationalInfo;
+            var emptyStatesList = new List<StateInfo>();
+            foreach (var item in countriesTagsMap)
+            {
+                ++count;
+                double progress = ((double)count / countriesTagsMap.Count) * 100;
+                WeakReferenceMessenger.Default.Send(Tuple.Create(progress, item.Value), EventId.UpdateParseProgressBar);
+                ParseItemNumberLabel = $"{count} / {countriesTagsMap.Count}";
+
+                if (!CountryFileParser.TryParseFile(item.Value, out var parser, out var errorMessage))
+                {
+                    _logger.Warn("{0} 文件出现问题, 错误信息: {1}", item.Value, errorMessage);
+                    continue;
+                }
+                
+                if (nationalStatesMap.TryGetValue(item.Key, out var countryOwnStates))
+                {
+                    nationalInfo = new NationalInfo(parser!, countryOwnStates, item.Key);
+                }
+                else
+                {
+                    nationalInfo = new NationalInfo(parser!, emptyStatesList, item.Key);
+                }
+
+                _nationalInfoList.Add(nationalInfo);
+            }
+        }
 
         [RelayCommand]
         private void SelectGameRootFolderButtonClick()

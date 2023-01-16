@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Random_HOI4.Logic.Util.CWTool;
+using HOI_Message.Logic.Util.CWTool;
 
 namespace HOI_Message.Logic
 {
@@ -17,9 +17,10 @@ namespace HOI_Message.Logic
 
         public Descriptor(string path)
         {
-            if (!CWToolsAdapter.TryParseFile(path, out var root))
+            var root = new CWToolsAdapter(path);
+            if (!root.IsSuccess)
             {
-                throw new ArgumentException($"无法解析文件, path: {path}", nameof(path));
+                throw new ArgumentException($"无法解析文件, path: {path}, 错误信息: {root.ErrorMessage}", nameof(path));
             }
 
             var result = root.Root.Leaves;
