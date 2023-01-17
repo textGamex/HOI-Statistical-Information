@@ -204,7 +204,7 @@ namespace HOI_Message.ViewModels
         {
             foreach (var item in _nationalInfoList)
             {
-                var oobFilePath = Path.Combine(GameRootPath, "history", "units", item.OOBName);
+                var oobFilePath = Path.Combine(GameRootPath, "history", "units", $"{item.OOBName}.txt");
 
                 if (!File.Exists(oobFilePath))
                 {
