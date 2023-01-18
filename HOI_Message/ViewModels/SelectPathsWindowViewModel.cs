@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -17,6 +18,9 @@ using HOI_Message.Logic.Unit;
 using NLog;
 using static HOI_Message.Logic.Localisation.LocalisationData;
 using MessageBox = HandyControl.Controls.MessageBox;
+using CWTools.Games;
+using HOI_Message.Logic.Util.CWTool;
+using System.Linq;
 
 namespace HOI_Message.ViewModels
 {
@@ -44,18 +48,18 @@ namespace HOI_Message.ViewModels
         [ObservableProperty]
         private string modTags = string.Empty;
 
+        [ObservableProperty]
+        private double parseProgressBarValue = 0.0;
+
         private readonly Dictionary<DataPaths, string> _dataPathMap = new(8);
 
         private List<StateInfo>? _statesInfo = null;
 
         private GameLocalisation _localisation = GameLocalisation.Empty;
 
-        private readonly List<NationalInfo> _nationalInfoList = new();
+        private readonly Dictionary<string, NationalInfo> _nationalInfoMap = new();
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-
-        //private string? _modDescriptorPath = null;
 
         private const string DescriptorName = "descriptor.mod";
 
@@ -79,7 +83,7 @@ namespace HOI_Message.ViewModels
                 var descriptorPath = Path.Combine(GameRootPath, DescriptorName);
                 if (!File.Exists(descriptorPath))
                 {
-                    return;                    
+                    return;
                 }
 
                 try
@@ -90,7 +94,7 @@ namespace HOI_Message.ViewModels
                 catch (ParseException ex)
                 {
                     _logger.Warn(ex);
-                    MessageBox.Warning("MOD描述文件解析错误");
+                    MessageBox.Warning("MOD描述文件解析错误, 未解析出信息.");
                     return;
                 }
             }
@@ -136,24 +140,34 @@ namespace HOI_Message.ViewModels
             AddLocalisationData(_dataPathMap[DataPaths.Localisation]);
             AddCountriesInfo(GameRootPath);
             AddOOB();
+            AddCountriesColor();
 
             // 配置全局资源
-            GameModels._countries = _nationalInfoList!;
+            GameModels._countries = new List<NationalInfo>(_nationalInfoMap.Values);
             GameModels.Localisation = _localisation;
             WeakReferenceMessenger.Default.Send(string.Empty, EventId.ParseDataSuccess);
         }
 
-        private void AddStateData(string folderPath)
+        private async void AddStateData(string folderPath)
         {
             var dir = new DirectoryInfo(folderPath);
             var files = dir.GetFiles();
             _statesInfo = new List<StateInfo>(files.Length);
 
+            uint count = 0;
             foreach (var file in files)
             {
-                _statesInfo.Add(new StateInfo(file.FullName));
-
-                //刷新进度条
+                count++;
+                try
+                {
+                    var state = new StateInfo(file.FullName);
+                    _statesInfo.Add(state);
+                }
+                catch (ParseException ex)
+                {
+                    _logger.Warn(ex);
+                }
+                //刷新进度条                               
                 double progressBarValue = (_statesInfo.Count / (double)files.Length) * 100;
                 WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file.FullName), EventId.UpdateParseProgressBar);
                 ParseItemNumberLabel = $"{_statesInfo.Count} / {files.Length}";
@@ -197,6 +211,7 @@ namespace HOI_Message.ViewModels
                 if (!CountryFileParser.TryParseFile(item.Value, out var parser, out var errorMessage))
                 {
                     _logger.Warn("{0} 文件出现问题, 错误信息: {1}", item.Value, errorMessage);
+                    _nationalInfoMap.Add(item.Key, NationalInfo.Empty);
                     continue;
                 }
 
@@ -209,14 +224,16 @@ namespace HOI_Message.ViewModels
                     nationalInfo = new NationalInfo(parser!, emptyStatesList, item.Key);
                 }
 
-                _nationalInfoList.Add(nationalInfo);
+                _nationalInfoMap.Add(item.Key, nationalInfo);
             }
         }
 
         private void AddOOB()
         {
-            foreach (var item in _nationalInfoList)
+            uint count = 0;
+            foreach (var item in _nationalInfoMap.Values)
             {
+                count++;
                 var oobFilePath = Path.Combine(GameRootPath, "history", "units", $"{item.OOBName}.txt");
 
                 if (!File.Exists(oobFilePath))
@@ -232,6 +249,37 @@ namespace HOI_Message.ViewModels
                 {
                     _logger.Warn(ex);
                     item.UnitInfo = UnitInfo.Empty;
+                }
+                var value = ((double)count / _nationalInfoMap.Count) * 100;
+                WeakReferenceMessenger.Default.Send(Tuple.Create(value, oobFilePath), EventId.UpdateParseProgressBar);
+                ParseItemNumberLabel = $"{count} / {_nationalInfoMap.Count}";
+            }
+        }
+
+        private void AddCountriesColor()
+        {
+            var map = NationalInfo.GetCountriesColorFilePath(GameRootPath);
+
+            foreach (var item in map)
+            {
+                var parser = new CWToolsAdapter(item.Value);
+                if (!parser.IsSuccess)
+                {
+                    _logger.Warn($"{item.Value} 解析失败");
+                    continue;
+                }
+
+                var colorData = parser.Root.Child("color").Value.LeafValues.ToList();
+                byte red = byte.Parse(colorData[0].Value.ToRawString());
+                byte green = byte.Parse(colorData[1].Value.ToRawString());
+                byte blue = byte.Parse(colorData[2].Value.ToRawString());
+                if (_nationalInfoMap.TryGetValue(item.Key, out var country))
+                {
+                    country.MapColor = new SkiaSharp.SKColor(red, green, blue);
+                }
+                else
+                {
+                    _logger.Warn($"未找到 '{item.Key}', path:{item.Value}");
                 }
             }
         }

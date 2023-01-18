@@ -17,11 +17,14 @@ public class CountryFileParser
     public string RulingParty { get; private set; } = string.Empty;
 
     /// <summary>
-    /// 
+    /// 尝试解析国家信息文件
     /// </summary>
-    /// <param name="filePath"></param>
-    /// <param name="parser"></param>
-    /// <param name="errorMessage"></param>
+    /// <remarks>
+    /// 国家信息文件在 Hearts of Iron IV\history\countries 下
+    /// </remarks>
+    /// <param name="filePath">文件绝对路径</param>
+    /// <param name="parser">解析器</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <returns></returns>
     /// <exception cref="FileNotFoundException">当文件不存在时</exception>
     public static bool TryParseFile(string filePath, out CountryFileParser? parser, out string errorMessage)

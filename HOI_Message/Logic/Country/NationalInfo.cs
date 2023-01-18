@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.State;
 using HOI_Message.Logic.Unit;
 using HOI_Message.Logic.Util.CWTool;
+using SkiaSharp;
 
 namespace HOI_Message.Logic.Country;
 
@@ -19,18 +21,35 @@ public class NationalInfo
     public string OOBName { get; private set; }
     public byte ResearchSlotsNumber { get; private set; }
     public int ConvoysNumber { get; private set; }
-    public UnitInfo UnitInfo { get; set; }
     public string RulingParty { get; }
-
+    public UnitInfo UnitInfo { get; set; } = UnitInfo.Empty;
+    public SKColor? MapColor { get; set; } = null;
+    public static NationalInfo Empty => _empty;
 
     private readonly List<StateInfo> _states;
     private readonly Lazy<long> _manpower;
     private readonly Lazy<Dictionary<string, uint>> _buildings;
     private readonly Lazy<Dictionary<string, uint>> _resources;
+    private readonly static NationalInfo _empty = new();
 
     public NationalInfo(CountryFileParser parser, List<StateInfo> states, string? tag = null)
     {
-        _states = states ?? throw new ArgumentNullException(nameof(states));
+        _states = states;
+        SetTagProperty(tag);
+
+        _manpower = new Lazy<long>(_states.Sum(x => x.Manpower));
+        _buildings = new Lazy<Dictionary<string, uint>>(GetAllBuildingsSumLazy);
+        _resources = new Lazy<Dictionary<string, uint>>(GetAllResourcesSumLazy);
+        OOBName = parser.OOBName;
+        ResearchSlotsNumber = parser.ResearchSlotsNumber;
+        ConvoysNumber = parser.ConvoysNumber;
+        RulingParty = parser.RulingParty;
+
+        _states.TrimExcess();
+    }
+
+    private void SetTagProperty(string? tag)
+    {
         if (tag is null)
         {
             if (_states.Count != 0)
@@ -46,16 +65,6 @@ public class NationalInfo
         {
             Tag = tag;
         }
-
-        _manpower = new Lazy<long>(_states.Sum(x => x.Manpower));
-        _buildings = new Lazy<Dictionary<string, uint>>(GetAllBuildingsSumLazy);
-        _resources = new Lazy<Dictionary<string, uint>>(GetAllResourcesSumLazy);
-        OOBName = parser.OOBName;
-        ResearchSlotsNumber = parser.ResearchSlotsNumber;
-        ConvoysNumber = parser.ConvoysNumber;
-        RulingParty = parser.RulingParty;
-
-        _states.TrimExcess();
     }
 
     /// <summary>
@@ -82,6 +91,17 @@ public class NationalInfo
         }
 
         return map;
+    }
+
+    private NationalInfo()
+    {
+        Tag = string.Empty;
+        OOBName = string.Empty;
+        RulingParty = string.Empty;
+        _states = new List<StateInfo>();
+        _manpower = new Lazy<long>(() => 0);
+        _buildings = new Lazy<Dictionary<string, uint>>();        
+        _resources = new Lazy<Dictionary<string, uint>>();
     }
 
     public uint GetBuildingsSum(string buildingsType)
@@ -161,6 +181,39 @@ public class NationalInfo
             map[countryTag] = file.FullName;
         }
 
+        return map;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="gameRootPath"></param>
+    /// <returns>Key是国家Tag, Value是国家颜色绝对路径</returns>
+    /// <exception cref="ParseException"></exception>
+    public static Dictionary<string, string> GetCountriesColorFilePath(string gameRootPath)
+    {
+        const string Common = "common";
+        var folderPath = Path.Combine(gameRootPath, Common, "country_tags");
+        var files = new DirectoryInfo(folderPath).GetFiles();
+        var map = new Dictionary<string, string>();
+
+        foreach (var file in files)
+        {
+            var root = new CWToolsAdapter(file.FullName);
+            if (!root.IsSuccess)
+            {
+                throw new ParseException();
+            }
+            foreach (var leaf in root.Root.Leaves)
+            {
+                if (leaf.Key == "dynamic_tags")
+                {
+                    continue;
+                }
+                var paths = leaf.Value.ToRawString().Split('/');
+                map[leaf.Key] = Path.Combine(gameRootPath, Common, paths[0], paths[1]);
+            }
+        }
         return map;
     }
 }

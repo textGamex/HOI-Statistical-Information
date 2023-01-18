@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.IO;
+using HOI_Message.Logic.CustomException;
 
 namespace HOI_Message.Logic.State;
 
@@ -21,9 +22,15 @@ public class StateInfo
     private readonly IDictionary<string, byte> _buildingMap;
     private readonly Lazy<int> _hashCode;
 
-    public StateInfo(string path)
+    /// <summary>
+    /// 按文件绝对路径构建对象
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+    /// <exception cref="ParseException">当文件解析错误时</exception>
+    public StateInfo(string filePath)
     {
-        var parser = new StateFileParser(path);
+        var parser = new StateFileParser(filePath);
 
         Id = parser.GetId();
         Name = parser.GetName();
@@ -36,9 +43,9 @@ public class StateInfo
         _hashCode = new Lazy<int>(GetHashCodeLazy);
     }
 
-    public ReadOnlyCollection<string> GetHasCoreTags()
+    public IEnumerable<string> GetHasCoreTags()
     {
-        return _hasCoreTags.AsReadOnly();
+        return _hasCoreTags;
     }
 
     #region 散列码实现

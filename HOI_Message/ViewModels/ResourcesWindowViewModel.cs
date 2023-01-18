@@ -5,6 +5,8 @@ using HOI_Message.Logic.Country;
 using HOI_Message.Logic.Localisation;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace HOI_Message.ViewModels;
 
@@ -31,10 +33,16 @@ public class ResourcesWindowViewModel
                 {
                     point.PrimaryValue = message.GetResourcesSum(resourcesType);
                     point.SecondaryValue = point.Context.Entity.EntityIndex;
-                },
+                },                
                 TooltipLabelFormatter =
         (chartPoint) => $"{chartPoint.Context.Series.Name}: {chartPoint.PrimaryValue} ({chartPoint.StackedValue.Share:P2})",
             };
+
+            if (country.MapColor is not null)
+            {
+                pieSeries.Fill = new SolidColorPaint((SKColor)country.MapColor);
+            }
+
             data.Add(pieSeries);
         }
         Series = data;

@@ -22,12 +22,16 @@ internal class CWToolsAdapter
     }
 
     /// <summary>
-    /// 根据路径解析文件.
+    /// 根据路径解析文件
     /// </summary>
-    /// <param name="filePath">文件路径</param>
+    /// <param name="filePath">文件绝对路径</param>
     /// <exception cref="FileNotFoundException">当文件不存在时</exception>
     public CWToolsAdapter(string filePath)
     {
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("文件不存在", filePath);
+        }
         var result = parseEventFile(filePath);
         if (result.IsSuccess)
         {

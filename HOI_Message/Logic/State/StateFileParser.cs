@@ -31,6 +31,9 @@ internal class StateFileParser
     /// <summary>
     /// 按文件绝对路径解析
     /// </summary>
+    /// <remarks>
+    /// 地块文件在 Hearts of Iron IV\history\states 下
+    /// </remarks>
     /// <param name="filePath">地块的绝对路径</param>
     /// <exception cref="ParseException">当文件解析失败时</exception>
     /// <exception cref="ArgumentException">当文件为空时</exception>
