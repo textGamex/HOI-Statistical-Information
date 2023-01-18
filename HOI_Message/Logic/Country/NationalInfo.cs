@@ -19,7 +19,9 @@ public class NationalInfo
     public string OOBName { get; private set; }
     public byte ResearchSlotsNumber { get; private set; }
     public int ConvoysNumber { get; private set; }
-    public UnitInfo UnitInfo { get; set; }    
+    public UnitInfo UnitInfo { get; set; }
+    public string RulingParty { get; }
+
 
     private readonly List<StateInfo> _states;
     private readonly Lazy<long> _manpower;
@@ -51,44 +53,15 @@ public class NationalInfo
         OOBName = parser.OOBName;
         ResearchSlotsNumber = parser.ResearchSlotsNumber;
         ConvoysNumber = parser.ConvoysNumber;
+        RulingParty = parser.RulingParty;
 
         _states.TrimExcess();
-    }
-
-    public static IList<NationalInfo> ByFolderPath(string gameFolderPath, IEnumerable<StateInfo> states)
-    {
-        var nationalInfoList = new List<NationalInfo>();
-        var countriesTagsMap = GetAllCountriesTag(gameFolderPath);
-        var nationalStatesMap = ClassifyStates(states);
-
-        NationalInfo nationalInfo;
-        var emptyStatesList = new List<StateInfo>();
-
-        foreach (var item in countriesTagsMap)
-        {
-            if (!CountryFileParser.TryParseFile(item.Value, out var parser, out _))
-            {
-                throw new Exception();
-            }
-            if (nationalStatesMap.TryGetValue(item.Key, out var countryOwnStates))
-            {
-                nationalInfo = new NationalInfo(parser!, countryOwnStates, item.Key);
-            }
-            else
-            {
-                nationalInfo = new NationalInfo(parser!, emptyStatesList, item.Key);
-            }               
-
-            nationalInfoList.Add(nationalInfo);
-        }
-
-        return nationalInfoList;
     }
 
     /// <summary>
     /// 按地区控制国家进行分类
     /// </summary>
-    /// <param name="states"></param>
+    /// <param name="states">游戏中所有地块数据</param>
     /// <returns>Key是国家 Tag, Value是国家控制的地块集合</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Dictionary<string, List<StateInfo>> ClassifyStates(IEnumerable<StateInfo> states)

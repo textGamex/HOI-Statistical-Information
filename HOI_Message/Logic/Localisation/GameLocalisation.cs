@@ -126,4 +126,13 @@ public class GameLocalisation
             return countryTag;
         }
     }
+
+    public string GetCountryNameByRulingParty(string countryTag, string rulingParty)
+    {
+        if (TryGetValue($"{countryTag}_{rulingParty}", out var name))
+        {
+            return name;
+        }
+        return countryTag;
+    }
 }

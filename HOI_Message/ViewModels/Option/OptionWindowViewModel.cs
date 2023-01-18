@@ -29,5 +29,11 @@ namespace HOI_Message.ViewModels.Option
         {
             WeakReferenceMessenger.Default.Send(string.Empty, EventId.ClickMenuStatesOption);
         }
+
+        [RelayCommand]
+        private void ClickMenuCountriesInfoOption() 
+        {
+            WeakReferenceMessenger.Default.Send(string.Empty, EventId.ClickMenuCountriesInfoOption);
+        }
     }
 }

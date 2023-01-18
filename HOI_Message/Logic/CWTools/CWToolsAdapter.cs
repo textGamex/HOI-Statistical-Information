@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
+using CWTools.CSharp;
 using static CWTools.Parser.CKParser;
 using static CWTools.Process.CK2Process;
-using static CWTools.Parser.Types;
-using static FParsec.Error;
-using CWTools.CSharp;
-using CWTools.Process;
-using CWTools.Parser;
-using Microsoft.VisualBasic;
 
 namespace HOI_Message.Logic.Util.CWTool;
 
@@ -28,6 +21,11 @@ internal class CWToolsAdapter
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
+    /// <summary>
+    /// 根据路径解析文件.
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
     public CWToolsAdapter(string filePath)
     {
         var result = parseEventFile(filePath);

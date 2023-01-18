@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Linq;
 using HOI_Message.Logic.Util.CWTool;
 
@@ -14,8 +14,17 @@ public class CountryFileParser
     public byte ResearchSlotsNumber { get; private set; } = 3;
     public int CapitalId { get; private set; } = -1;
     public int ConvoysNumber { get; private set; } = 0;
+    public string RulingParty { get; private set; } = string.Empty;
 
-    public static bool TryParseFile(string filePath, out CountryFileParser? parser, out string? errorMessage)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="parser"></param>
+    /// <param name="errorMessage"></param>
+    /// <returns></returns>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+    public static bool TryParseFile(string filePath, out CountryFileParser? parser, out string errorMessage)
     {
         var adapter = new CWToolsAdapter(filePath);
         if (adapter.IsSuccess)
@@ -23,7 +32,7 @@ public class CountryFileParser
             parser = Parse(adapter);
             errorMessage = string.Empty;
             return true;
-        }        
+        }
         parser = null;
         errorMessage = adapter.ErrorMessage;
         return false;
@@ -34,11 +43,7 @@ public class CountryFileParser
         var root = adapter.Root;
         var parser = new CountryFileParser();
 
-        if (root.Has(Key.OOB))
-        {
-            var oobName = root.Leafs(Key.OOB).Last().Value;
-            parser.OOBName = oobName.ToRawString();
-        }
+        parser.OOBName = TryGetOOBName(root);
 
         if (root.Has(Key.SetResearchSlots))
         {
@@ -57,10 +62,41 @@ public class CountryFileParser
             var number = root.Leafs(Key.SetConvoys).Last().Value;
             parser.ConvoysNumber = int.Parse(number.ToString());
         }
+
+        if (root.Has(Key.SetPolitics))
+        {
+            var politics = root.Child(Key.SetPolitics).Value;
+            if (politics.Has(Key.RulingParty))
+            {
+                var rulingParty = politics.Leafs(Key.RulingParty).Last();
+                parser.RulingParty = rulingParty.Value.ToRawString();
+            }
+        }
         return parser;
     }
 
-    private CountryFileParser() { }
+    private CountryFileParser()
+    {
+    }
+
+    private static string TryGetOOBName(CWTools.Process.CK2Process.EventRoot root)
+    {
+        if (root.Has(Key.OOB))
+        {
+            var oobName = root.Leafs(Key.OOB).Last().Value;
+            return oobName.ToRawString();
+        }
+
+        //TODO: 应该实现按DLC分类
+        foreach (var node in root.Childs("if"))
+        {
+            if (node.Has("set_oob"))
+            {
+                return node.Leafs("set_oob").Last().Value.ToRawString();
+            }
+        }
+        return string.Empty;
+    }
 
     private static class Key
     {
@@ -68,6 +104,8 @@ public class CountryFileParser
         public const string SetResearchSlots = "set_research_slots";
         public const string Capital = "capital";
         public const string SetConvoys = "set_convoys";
+        public const string SetPolitics = "set_politics";
+        public const string RulingParty = "ruling_party";
     }
 }
 

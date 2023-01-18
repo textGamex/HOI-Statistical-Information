@@ -17,7 +17,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.15*" />
+            <ColumnDefinition Width="0.16*" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
@@ -27,19 +27,38 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             BorderThickness="1">
-            <hc:SideMenuItem Command="{Binding ClickMenuResourcesOptionCommand}" Header="资源">
+
+            <hc:SideMenuItem
+                Command="{Binding ClickMenuCountriesInfoOptionCommand}"
+                FontSize="14"
+                Header="国家信息">
+                <hc:SideMenuItem.Icon>
+                    <Image />
+                </hc:SideMenuItem.Icon>
+            </hc:SideMenuItem>
+
+            <hc:SideMenuItem
+                Command="{Binding ClickMenuResourcesOptionCommand}"
+                FontSize="15"
+                Header="资源">
                 <hc:SideMenuItem.Icon>
                     <Image Width="43" Source="/HOI_Message;component/Resources/Image/OreIcon.png" />
                 </hc:SideMenuItem.Icon>
             </hc:SideMenuItem>
 
-            <hc:SideMenuItem Command="{Binding ClickMenuStatesOptionCommand}" Header="地块">
+            <hc:SideMenuItem
+                Command="{Binding ClickMenuStatesOptionCommand}"
+                FontSize="15"
+                Header="地块">
                 <hc:SideMenuItem.Icon>
                     <Image Source="/Resources/Image/WorldIcon.png" />
                 </hc:SideMenuItem.Icon>
             </hc:SideMenuItem>
 
-            <hc:SideMenuItem Command="{Binding ClickMenuManpowerOptionCommand}" Header="人力">
+            <hc:SideMenuItem
+                Command="{Binding ClickMenuManpowerOptionCommand}"
+                FontSize="15"
+                Header="人力">
                 <hc:SideMenuItem.Icon>
                     <Image
                         Width="43"
@@ -47,6 +66,7 @@
                         Source="/Resources/Image/ManpowerIcon.png" />
                 </hc:SideMenuItem.Icon>
             </hc:SideMenuItem>
+
         </hc:SideMenu>
 
         <Grid x:Name="MainMessageShowGrid" Grid.Column="1" />

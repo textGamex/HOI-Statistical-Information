@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
 using HOI_Message.Logic.Util.CWTool;
+using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.Country;
 using System.Collections;
 
@@ -15,18 +17,25 @@ namespace HOI_Message.Logic.Unit;
 public class UnitInfo
 {
     public static UnitInfo Empty => _empty;
+    public int DivisionsSum => _map.Values.Sum(x => x.Count);
 
     // Key是模板名称
     private readonly Dictionary<string, Unit> _map = new(8);
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly static UnitInfo _empty = new();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePath">文件绝对路径</param>
+    /// <exception cref="ParseException">当文件解析失败时</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
     public UnitInfo(string filePath)
     {
         var root = new CWToolsAdapter(filePath);
         if (!root.IsSuccess)
         {
-            throw new ArgumentException(root.ErrorMessage);
+            throw new ParseException(root.ErrorMessage);
         }
         if (!root.Root.Has(Key.DivisionTemplate) || !root.Root.Has(Key.Units))
         {
@@ -45,7 +54,6 @@ public class UnitInfo
                 _logger.Warn($"{filePath} 存在重复的name {typeName}");
             }
         }
-
 
         // 统计开局部署军队数量
         var unitsNode = root.Root.Child(Key.Units).Value;

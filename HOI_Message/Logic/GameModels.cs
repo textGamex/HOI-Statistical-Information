@@ -13,7 +13,7 @@ namespace HOI_Message.Logic;
 public static class GameModels
 {
     /// <summary>
-    /// 生成图像时应该调用这个方法
+    /// 平时应该调用这个方法
     /// </summary>
     public static IReadOnlyCollection<NationalInfo> Countries => _countries.AsReadOnly();
 

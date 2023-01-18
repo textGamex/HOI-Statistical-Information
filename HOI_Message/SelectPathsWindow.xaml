@@ -93,8 +93,9 @@
         <Label
             x:Name="ParseItemNameShowLabel"
             Width="190"
-            Margin="365,0,0,0"
+            Margin="365,317,0,0"
             HorizontalAlignment="Left"
+            VerticalAlignment="Top"
             Content="{Binding ParseItemNumberLabel}" />
         <Image
             x:Name="CoverImage"

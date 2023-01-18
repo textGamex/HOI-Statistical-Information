@@ -1,22 +1,22 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using HOI_Message.Logic;
 using HOI_Message.Logic.Country;
+using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.Localisation;
 using HOI_Message.Logic.State;
+using HOI_Message.Logic.Unit;
+using NLog;
 using static HOI_Message.Logic.Localisation.LocalisationData;
 using MessageBox = HandyControl.Controls.MessageBox;
-using NLog;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Linq;
-using HOI_Message.Logic.Unit;
 
 namespace HOI_Message.ViewModels
 {
@@ -72,32 +72,45 @@ namespace HOI_Message.ViewModels
         {
             if (e.PropertyName == nameof(GameRootPath))
             {
-                _dataPathMap[DataPaths.States] = Path.Combine(GameRootPath, "history", "states");       
+                _dataPathMap[DataPaths.States] = Path.Combine(GameRootPath, "history", "states");
                 LocalisationPath = Path.Combine(GameRootPath, "localisation");
 
                 // 尝试查找mod配置文件
                 var descriptorPath = Path.Combine(GameRootPath, DescriptorName);
-                if (File.Exists(descriptorPath))
-                {                    
+                if (!File.Exists(descriptorPath))
+                {
+                    return;                    
+                }
+
+                try
+                {
                     var descriptor = new Descriptor(descriptorPath);
-                    var picturePath = Path.Combine(GameRootPath, descriptor.PictureName);
-                    if (File.Exists(picturePath))
-                    {
-                        ImageSource = new BitmapImage(new Uri(picturePath, UriKind.Absolute));
-                    }
-                    
-                    ModName = descriptor.Name;
-                    ModVersion = descriptor.Version;
-                    ModTags = string.Join(", ", descriptor.Tags);
+                    SetModInfoOnView(descriptor);
+                }
+                catch (ParseException ex)
+                {
+                    _logger.Warn(ex);
+                    MessageBox.Warning("MOD描述文件解析错误");
+                    return;
                 }
             }
-            if (e.PropertyName == nameof(LocalisationPath))
+            else if (e.PropertyName == nameof(LocalisationPath))
             {
                 _dataPathMap[DataPaths.Localisation] = LocalisationPath;
             }
         }
 
-
+        private void SetModInfoOnView(Descriptor descriptor)
+        {
+            var picturePath = Path.Combine(GameRootPath, descriptor.PictureName);
+            if (File.Exists(picturePath))
+            {
+                ImageSource = new BitmapImage(new Uri(picturePath, UriKind.Absolute));
+            }
+            ModName = descriptor.Name;
+            ModVersion = descriptor.Version;
+            ModTags = string.Join(", ", descriptor.Tags);
+        }
 
         [RelayCommand]
         void StartParseButtonClick()
@@ -186,7 +199,7 @@ namespace HOI_Message.ViewModels
                     _logger.Warn("{0} 文件出现问题, 错误信息: {1}", item.Value, errorMessage);
                     continue;
                 }
-                
+
                 if (nationalStatesMap.TryGetValue(item.Key, out var countryOwnStates))
                 {
                     nationalInfo = new NationalInfo(parser!, countryOwnStates, item.Key);
@@ -211,7 +224,15 @@ namespace HOI_Message.ViewModels
                     item.UnitInfo = UnitInfo.Empty;
                     continue;
                 }
-                item.UnitInfo = new UnitInfo(oobFilePath);
+                try
+                {
+                    item.UnitInfo = new UnitInfo(oobFilePath);
+                }
+                catch (ParseException ex)
+                {
+                    _logger.Warn(ex);
+                    item.UnitInfo = UnitInfo.Empty;
+                }
             }
         }
 

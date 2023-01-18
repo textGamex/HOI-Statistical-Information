@@ -49,5 +49,12 @@
         /// 显示地区信息
         /// </summary>
         public const byte ShowStatesInfoWindow = 8;
+
+        /// <summary>
+        /// 当用户点击菜单选项中的国家信息时触发
+        /// </summary>
+        public const byte ClickMenuCountriesInfoOption = 9;
+
+        public const byte ShowCountriesInfoWindow = 10;
     }
 }

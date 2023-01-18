@@ -2,8 +2,10 @@
 using NLog;
 using HOI_Message.Logic.Util.CWTool;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using HOI_Message.Logic.CustomException;
 
 namespace HOI_Message.Logic.State;
 
@@ -26,16 +28,23 @@ internal class StateFileParser
         public const string Name = "name";
     }
 
-    public StateFileParser(string path)
+    /// <summary>
+    /// 按文件绝对路径解析
+    /// </summary>
+    /// <param name="filePath">地块的绝对路径</param>
+    /// <exception cref="ParseException">当文件解析失败时</exception>
+    /// <exception cref="ArgumentException">当文件为空时</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+    public StateFileParser(string filePath)
     {
-        var adapter = new CWToolsAdapter(path);
+        var adapter = new CWToolsAdapter(filePath);
         if (adapter.IsSuccess)
         {
             _root = adapter;
         }
         else
         {
-            throw new ArgumentException($"文件解析错误, 路径: {path},错误信息:{adapter.ErrorMessage}", nameof(path));
+            throw new ParseException($"文件解析错误, 路径: {filePath},错误信息:{adapter.ErrorMessage}");
         }
 
         if (_root.Root.Has(Key.State))
@@ -44,7 +53,7 @@ internal class StateFileParser
         }
         else
         {
-            throw new ArgumentException($"文件为空, 路径: {path}");
+            throw new ArgumentException($"文件为空, 路径: {filePath}");
         }
     }
 
