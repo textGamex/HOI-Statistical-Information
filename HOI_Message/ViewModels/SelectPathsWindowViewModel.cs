@@ -57,6 +57,9 @@ namespace HOI_Message.ViewModels
 
         private GameLocalisation _localisation = GameLocalisation.Empty;
 
+        /// <summary>
+        /// Key是国家Tag, Value是国家信息
+        /// </summary>
         private readonly Dictionary<string, NationalInfo> _nationalInfoMap = new();
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();

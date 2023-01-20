@@ -16,11 +16,27 @@ namespace HOI_Message.Logic.Country;
 public class NationalInfo
 {
     public string Tag { get; private set; }
-    public long Manpower => _manpower.Value;
+
+    /// <summary>
+    /// 一个国家的总人口
+    /// </summary>
+    public long ManpowerSum => _manpower.Value;
+
+    /// <summary>
+    /// 一个国家控制的所有地块数量
+    /// </summary>
     public int OwnStatesNumber => _states.Count;
     public string OOBName { get; private set; }
+
+    /// <summary>
+    /// 科研槽数量
+    /// </summary>
     public byte ResearchSlotsNumber { get; private set; }
     public int ConvoysNumber { get; private set; }
+
+    /// <summary>
+    /// 当前执政党
+    /// </summary>
     public string RulingParty { get; }
     public UnitInfo UnitInfo { get; set; } = UnitInfo.Empty;
     public SKColor? MapColor { get; set; } = null;
