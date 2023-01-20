@@ -11,6 +11,7 @@
     Width="900"
     Height="650"
     d:DataContext="{d:DesignInstance Type=vm:SelectPathsWindowViewModel}"
+    Closed="Window_Closed"
     mc:Ignorable="d">
     <Grid>
         <Button

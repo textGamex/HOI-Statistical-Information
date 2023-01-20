@@ -20,6 +20,7 @@ namespace HOI_Message;
 public partial class SelectPathsWindow
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private bool _isUserClose = true;
 
     public SelectPathsWindow()
     {
@@ -51,6 +52,7 @@ public partial class SelectPathsWindow
         {
             ShowSuccessTipMessage();
 
+            _isUserClose = false;
             var newWindow = new OptionWindow();
             newWindow.Show();
             this.Close();
@@ -117,5 +119,13 @@ public partial class SelectPathsWindow
         }
 
         return map;
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        if (_isUserClose)
+        {
+            Environment.Exit(0);
+        }
     }
 }
