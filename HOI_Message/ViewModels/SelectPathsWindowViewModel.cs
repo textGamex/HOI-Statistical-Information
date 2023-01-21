@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -14,13 +14,10 @@ using HOI_Message.Logic.Country;
 using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.Localisation;
 using HOI_Message.Logic.State;
-using HOI_Message.Logic.Unit;
+using HOI_Message.Logic.Util.CWTool;
 using NLog;
 using static HOI_Message.Logic.Localisation.LocalisationData;
 using MessageBox = HandyControl.Controls.MessageBox;
-using CWTools.Games;
-using HOI_Message.Logic.Util.CWTool;
-using System.Linq;
 
 namespace HOI_Message.ViewModels
 {
@@ -202,7 +199,6 @@ namespace HOI_Message.ViewModels
             var nationalStatesMap = NationalInfo.ClassifyStates(_statesInfo ?? throw new Exception());
             uint count = 0;
 
-            NationalInfo nationalInfo;
             var emptyStatesList = new List<StateInfo>();
             foreach (var item in countriesTagsMap)
             {
@@ -218,6 +214,7 @@ namespace HOI_Message.ViewModels
                     continue;
                 }
 
+                NationalInfo nationalInfo;
                 if (nationalStatesMap.TryGetValue(item.Key, out var countryOwnStates))
                 {
                     nationalInfo = new NationalInfo(parser!, countryOwnStates, item.Key);
@@ -241,17 +238,15 @@ namespace HOI_Message.ViewModels
 
                 if (!File.Exists(oobFilePath))
                 {
-                    item.UnitInfo = UnitInfo.Empty;
                     continue;
                 }
                 try
                 {
-                    item.UnitInfo = new UnitInfo(oobFilePath);
+                    item.SetUnitInfo(oobFilePath);
                 }
                 catch (ParseException ex)
                 {
                     _logger.Warn(ex);
-                    item.UnitInfo = UnitInfo.Empty;
                 }
                 var value = ((double)count / _nationalInfoMap.Count) * 100;
                 WeakReferenceMessenger.Default.Send(Tuple.Create(value, oobFilePath), EventId.UpdateParseProgressBar);
@@ -265,6 +260,11 @@ namespace HOI_Message.ViewModels
 
             foreach (var item in map)
             {
+                if (!File.Exists(item.Value))
+                {
+                    _logger.Warn($"已定义颜色文件但未找到, path: '{item.Value}'");
+                    continue;
+                }
                 var parser = new CWToolsAdapter(item.Value);
                 if (!parser.IsSuccess)
                 {
@@ -273,16 +273,23 @@ namespace HOI_Message.ViewModels
                 }
 
                 var colorData = parser.Root.Child("color").Value.LeafValues.ToList();
-                byte red = byte.Parse(colorData[0].Value.ToRawString());
-                byte green = byte.Parse(colorData[1].Value.ToRawString());
-                byte blue = byte.Parse(colorData[2].Value.ToRawString());
-                if (_nationalInfoMap.TryGetValue(item.Key, out var country))
+                try
                 {
-                    country.MapColor = new SkiaSharp.SKColor(red, green, blue);
+                    byte red = byte.Parse(colorData[0].Value.ToRawString());
+                    byte green = byte.Parse(colorData[1].Value.ToRawString());
+                    byte blue = byte.Parse(colorData[2].Value.ToRawString());
+                    if (_nationalInfoMap.TryGetValue(item.Key, out var country))
+                    {
+                        country.MapColor = new SkiaSharp.SKColor(red, green, blue);
+                    }
+                    else
+                    {
+                        _logger.Warn($"未找到 '{item.Key}', path:{item.Value}");
+                    }
                 }
-                else
+                catch (FormatException)
                 {
-                    _logger.Warn($"未找到 '{item.Key}', path:{item.Value}");
+                    // 有可能是 hsv 格式而不是 rgb 格式, 现在先不管了
                 }
             }
         }

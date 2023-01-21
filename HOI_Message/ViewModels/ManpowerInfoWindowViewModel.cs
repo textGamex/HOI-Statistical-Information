@@ -19,7 +19,7 @@ internal class ManpowerInfoWindowViewModel
     {
         var data = new ObservableCollection<ISeries>();
         ushort count = 0;
-        foreach (var country in countries.OrderByDescending(x => x.Manpower))
+        foreach (var country in countries.OrderByDescending(x => x.ManpowerSum))
         {
             ++count;
             var pieSeries = new PieSeries<NationalInfo>
@@ -29,7 +29,7 @@ internal class ManpowerInfoWindowViewModel
 
                 Mapping = (message, point) =>
                 {
-                    point.PrimaryValue = message.Manpower;
+                    point.PrimaryValue = message.ManpowerSum;
                     point.SecondaryValue = point.Context.Entity.EntityIndex;
                 },
                 TooltipLabelFormatter =

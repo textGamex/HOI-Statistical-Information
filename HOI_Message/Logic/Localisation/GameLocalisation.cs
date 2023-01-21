@@ -6,7 +6,7 @@ using static HOI_Message.Logic.Localisation.LocalisationData;
 
 namespace HOI_Message.Logic.Localisation;
 
-public class GameLocalisation
+public sealed class GameLocalisation
 {
     private readonly IDictionary<string, Data> _datas = new Dictionary<string, Data>();
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -28,21 +28,6 @@ public class GameLocalisation
     {
         _datas = datas;
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="filePaths"></param>
-    /// <returns><c>Key</c>为本地化Key, <c>Value</c>为本地化数据</returns>
-    //private static Dictionary<string, Data> GetDatas(IEnumerable<string> filePaths)
-    //{
-    //    var map = new Dictionary<string, Data>();
-    //    foreach (var filePath in filePaths)
-    //    {
-    //        AddDataToMap(map, filePath);
-    //    }
-    //    return map;
-    //}
 
     public static void AddDataToMap(IDictionary<string, Data> map, string filePath)
     {

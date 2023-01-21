@@ -35,10 +35,10 @@ internal class CWToolsAdapter
     }
 
     /// <summary>
-    /// 
+    /// 根据文件内容和文件名称创建对象
     /// </summary>
-    /// <param name="fileName"></param>
-    /// <param name="text"></param>
+    /// <param name="fileName">文件名</param>
+    /// <param name="text">文件内容</param>
     public CWToolsAdapter(string fileName, string text) 
         : this(parseEventString(text, fileName))
     {

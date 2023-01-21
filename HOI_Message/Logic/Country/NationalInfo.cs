@@ -13,7 +13,7 @@ namespace HOI_Message.Logic.Country;
 /// <summary>
 /// 保存着一个国家的所有信息
 /// </summary>
-public class NationalInfo
+public partial class NationalInfo
 {
     public string Tag { get; private set; }
 
@@ -38,15 +38,15 @@ public class NationalInfo
     /// 当前执政党
     /// </summary>
     public string RulingParty { get; }
-    public UnitInfo UnitInfo { get; set; } = UnitInfo.Empty;
+    public ArmyUnitInfo ArmyUnitInfo => _armyUnitInfo;
     public SKColor? MapColor { get; set; } = null;
-    public static NationalInfo Empty => _empty;
+    public static NationalInfo Empty { get; } = new();
 
     private readonly List<StateInfo> _states;
     private readonly Lazy<long> _manpower;
     private readonly Lazy<Dictionary<string, uint>> _buildings;
     private readonly Lazy<Dictionary<string, uint>> _resources;
-    private readonly static NationalInfo _empty = new();
+    private ArmyUnitInfo _armyUnitInfo = ArmyUnitInfo.Empty;
 
     public NationalInfo(CountryFileParser parser, List<StateInfo> states, string? tag = null)
     {
@@ -54,8 +54,8 @@ public class NationalInfo
         SetTagProperty(tag);
 
         _manpower = new Lazy<long>(_states.Sum(x => x.Manpower));
-        _buildings = new Lazy<Dictionary<string, uint>>(GetAllBuildingsSumLazy);
-        _resources = new Lazy<Dictionary<string, uint>>(GetAllResourcesSumLazy);
+        _buildings = new Lazy<Dictionary<string, uint>>(() => LazyInitHelper.GetAllBuildingsSumLazy(_states));
+        _resources = new Lazy<Dictionary<string, uint>>(() => LazyInitHelper.GetAllResourcesSumLazy(_states));
         OOBName = parser.OOBName;
         ResearchSlotsNumber = parser.ResearchSlotsNumber;
         ConvoysNumber = parser.ConvoysNumber;
@@ -68,14 +68,7 @@ public class NationalInfo
     {
         if (tag is null)
         {
-            if (_states.Count != 0)
-            {
-                Tag = _states.First().OwnerTag;
-            }
-            else
-            {
-                Tag = "NONE";
-            }
+            Tag = _states.Count != 0 ? _states.First().OwnerTag : "NONE";
         }
         else
         {
@@ -115,19 +108,19 @@ public class NationalInfo
         OOBName = string.Empty;
         RulingParty = string.Empty;
         _states = new List<StateInfo>();
-        _manpower = new Lazy<long>(() => 0);
-        _buildings = new Lazy<Dictionary<string, uint>>();        
+        _manpower = new Lazy<long>(0L);
+        _buildings = new Lazy<Dictionary<string, uint>>();
         _resources = new Lazy<Dictionary<string, uint>>();
     }
 
     public uint GetBuildingsSum(string buildingsType)
     {
-        return _buildings.Value.TryGetValue(buildingsType, out uint vaule) ? vaule : 0;
+        return _buildings.Value.TryGetValue(buildingsType, out uint value) ? value : 0;
     }
 
     public uint GetResourcesSum(string resourcesType)
     {
-        return _resources.Value.TryGetValue(resourcesType, out uint vaule) ? vaule : 0;
+        return _resources.Value.TryGetValue(resourcesType, out uint value) ? value : 0;
     }
 
     public IList<string> GetAllResourcesTypes()
@@ -135,49 +128,6 @@ public class NationalInfo
         return new List<string>(_resources.Value.Keys);
     }
 
-    private Dictionary<string, uint> GetAllBuildingsSumLazy()
-    {
-        var map = new Dictionary<string, uint>(8);
-        foreach (var state in _states)
-        {
-            foreach (var type in state.Buildings.Keys)
-            {
-                if (map.TryGetValue(type, out var value))
-                {
-                    map[type] = value + state.Buildings[type];
-                }
-                else
-                {
-                    map.Add(type, state.Buildings[type]);
-                }
-            }
-        }
-
-        map.TrimExcess();
-        return map;
-    }
-
-    private Dictionary<string, uint> GetAllResourcesSumLazy()
-    {
-        var map = new Dictionary<string, uint>(8);
-        foreach (var state in _states)
-        {
-            foreach (var type in state.Resources.Keys)
-            {
-                if (map.TryGetValue(type, out var value))
-                {
-                    map[type] = value + state.Resources[type];
-                }
-                else
-                {
-                    map.Add(type, state.Resources[type]);
-                }
-            }
-        }
-
-        map.TrimExcess();
-        return map;
-    }
 
     /// <summary>
     /// 获得游戏内所有国家的 Tag 和对应的文件绝对路径
@@ -231,5 +181,16 @@ public class NationalInfo
             }
         }
         return map;
+    }
+
+    /// <summary>
+    /// 按文件绝对路径设置单位数据
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <exception cref="ParseException"></exception>
+    /// <exception cref="FileNotFoundException"></exception>
+    public void SetUnitInfo(string filePath)
+    {
+        _armyUnitInfo = new ArmyUnitInfo(filePath);
     }
 }

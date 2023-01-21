@@ -18,7 +18,7 @@ internal partial class CountriesInfoWindowViewModel : ObservableObject
 			datas.Add(new CountryData(localisation.GetCountryNameByRulingParty(country.Tag, country.RulingParty),
 				country.ResearchSlotsNumber,
 				localisation.GetValue(country.RulingParty),
-				country.UnitInfo.DivisionsSum));
+				country.ArmyUnitInfo.UnitSum));
 		}
 	}
 

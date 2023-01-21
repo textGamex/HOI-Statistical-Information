@@ -14,15 +14,15 @@ namespace HOI_Message.Logic.Unit;
 /// 一个国家的所有部队数据
 /// </summary>
 /// <see cref="NationalInfo"/>
-public class UnitInfo
+public class ArmyUnitInfo : UnitInfoBase
 {
-    public static UnitInfo Empty => _empty;
-    public int DivisionsSum => _map.Values.Sum(x => x.Count);
+    public override int UnitSum => _map.Values.Sum(x => x.Count);
+    public override string OwnCountryTag { get; } = string.Empty;
+    public static ArmyUnitInfo Empty { get; } = new();
 
     // Key是模板名称
     private readonly Dictionary<string, Unit> _map = new(8);
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private readonly static UnitInfo _empty = new();
 
     /// <summary>
     /// 
@@ -30,7 +30,7 @@ public class UnitInfo
     /// <param name="filePath">文件绝对路径</param>
     /// <exception cref="ParseException">当文件解析失败时</exception>
     /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-    public UnitInfo(string filePath)
+    public ArmyUnitInfo(string filePath)
     {
         var root = new CWToolsAdapter(filePath);
         if (!root.IsSuccess)
@@ -58,11 +58,10 @@ public class UnitInfo
         // 统计开局部署军队数量
         var unitsNode = root.Root.Child(Key.Units).Value;
         var divisions = unitsNode.Childs("division");
-        string unitName;
 
         foreach (var division in divisions)
         {
-            unitName = division.Leafs(Key.DivisionTemplate).Last().Value.ToRawString();
+            var unitName = division.Leafs(Key.DivisionTemplate).Last().Value.ToRawString();
             if (map.ContainsKey(unitName))
             {
                 map[unitName]++;
@@ -80,12 +79,12 @@ public class UnitInfo
         _map.TrimExcess();
     }
 
-    private UnitInfo()
+    private ArmyUnitInfo()
     {
         _map.TrimExcess();
     }
 
-    public class Unit
+    private sealed class Unit
     {
         public string TypeName { get; }
         public ushort Count { get; }
