@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.Util.CWTool;
+using System.Text.RegularExpressions;
 
 namespace HOI_Message.Logic
 {
-    public class Descriptor
+    public partial class Descriptor
     {
-        public string Name { get; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
 
         public string Version { get; } = string.Empty;
 
@@ -24,7 +25,8 @@ namespace HOI_Message.Logic
         /// <exception cref="FileNotFoundException">当文件不存在时</exception>
         public Descriptor(string modDescriptorPath)
         {
-            var root = new CWToolsAdapter(modDescriptorPath);
+            var fileText = File.ReadAllText(modDescriptorPath);
+            var root = new CWToolsAdapter(Path.GetFileName(modDescriptorPath), fileText);
             if (!root.IsSuccess)
             {
                 throw new ParseException($"无法解析文件, path: {modDescriptorPath}, 错误信息: {root.ErrorMessage}");
@@ -34,11 +36,6 @@ namespace HOI_Message.Logic
 
             foreach (var item in result)
             {
-                if (item.Key == Key.Name)
-                {
-                    Name = item.Value.ToRawString();
-                }
-
                 if (item.Key == Key.Version)
                 {
                     Version = item.Value.ToRawString();
@@ -48,7 +45,14 @@ namespace HOI_Message.Logic
                 {
                     PictureName = item.Value.ToRawString();
                 }
+
+                if (Version != null && PictureName != null)
+                {
+                    break;
+                }
             }
+
+            SetModName(fileText);
 
             if (root.Root.Has(Key.Tags))
             {
@@ -57,9 +61,17 @@ namespace HOI_Message.Logic
             }
         }
 
+        private void SetModName(string fileText)
+        {
+            var result = NameRegex().Match(fileText);
+            Name = result.Value;
+        }
+
+        [GeneratedRegex("(?<=name.*=.*\").*(?=\")", RegexOptions.Compiled)]
+        private static partial Regex NameRegex();
+
         private static class Key
         {
-            public const string Name = "name";
             public const string Version = "version";
             public const string Picture = "picture";
             public const string Tags = "tags";

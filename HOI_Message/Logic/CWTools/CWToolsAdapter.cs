@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using CWTools.CSharp;
+using CWTools.Parser;
+using FParsec;
 using static CWTools.Parser.CKParser;
 using static CWTools.Process.CK2Process;
 
@@ -26,22 +29,32 @@ internal class CWToolsAdapter
     /// </summary>
     /// <param name="filePath">文件绝对路径</param>
     /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-    public CWToolsAdapter(string filePath)
+    public CWToolsAdapter(string filePath) 
+        : this(File.Exists(filePath) ? parseEventFile(filePath) : throw new FileNotFoundException($"{filePath} 不存在", filePath))
     {
-        if (!File.Exists(filePath))
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="text"></param>
+    public CWToolsAdapter(string fileName, string text) 
+        : this(parseEventString(text, fileName))
+    {
+    }
+
+    private CWToolsAdapter(CharParsers.ParserResult<Types.ParsedFile, Microsoft.FSharp.Core.Unit> eventRoot)
+    {
+        if (eventRoot.IsSuccess)
         {
-            throw new FileNotFoundException("文件不存在", filePath);
-        }
-        var result = parseEventFile(filePath);
-        if (result.IsSuccess)
-        {
-            Root = processEventFile(result.GetResult());
+            Root = processEventFile(eventRoot.GetResult());
         }
         else
         {
             Root = new EventRoot(string.Empty, null);
         }
-        IsSuccess = result.IsSuccess;
-        ErrorMessage = result.GetError();
+        IsSuccess = eventRoot.IsSuccess;
+        ErrorMessage = eventRoot.GetError();
     }
 }
