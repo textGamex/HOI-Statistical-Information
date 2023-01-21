@@ -1,12 +1,10 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using NLog;
 
 namespace HOI_Message.Logic.Localisation;
 
@@ -25,6 +23,7 @@ public partial class LocalisationData
         _ = lines.RemoveAll(string.IsNullOrEmpty);
         if (lines.Count == 0)
         {
+            _datas = new Dictionary<string, Data>();
             Language = LanguageType.Unknown;
             return;
         }
@@ -34,7 +33,7 @@ public partial class LocalisationData
         _datas = new(lines.Count);
         foreach (var line in lines)
         {
-            var (Key, Value, Level) = Parse(line);   
+            var (Key, Value, Level) = Parse(line);
             if (_datas.TryGetValue(Key, out var oldData))
             {
                 if (Level >= oldData.Level)
@@ -84,7 +83,7 @@ public partial class LocalisationData
     public class Data
     {
         public string Key { get; }
-        public string Value { get; }        
+        public string Value { get; }
         public byte Level { get; }
         public static Data Empty => _empty;
         private static readonly Data _empty = new(string.Empty, string.Empty, default);
@@ -93,9 +92,9 @@ public partial class LocalisationData
         {
             Key = key;
             Value = value;
-            Level = level;            
+            Level = level;
         }
-        
+
         protected bool Equals(Data other)
         {
             return Key == other.Key && Value == other.Value && Level == other.Level;
