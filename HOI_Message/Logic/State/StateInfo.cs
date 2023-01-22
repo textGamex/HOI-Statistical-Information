@@ -8,7 +8,7 @@ namespace HOI_Message.Logic.State;
 /// <summary>
 /// 地块信息
 /// </summary>
-public class StateInfo
+public partial class StateInfo
 {
     public string OwnerTag { get; }
     public int Id { get; }

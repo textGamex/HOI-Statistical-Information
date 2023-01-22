@@ -39,7 +39,7 @@ public partial class NationalInfo
     /// </summary>
     public string RulingParty { get; }
     public ArmyUnitInfo ArmyUnitInfo => _armyUnitInfo;
-    public SKColor? MapColor { get; set; } = null;
+    public SKColor? MapColor { get; private set; }
     public static NationalInfo Empty { get; } = new();
 
     private readonly List<StateInfo> _states;
@@ -186,11 +186,23 @@ public partial class NationalInfo
     /// <summary>
     /// 按文件绝对路径设置单位数据
     /// </summary>
-    /// <param name="filePath"></param>
+    /// <remarks>
+    /// 单位信息文件在 history/units 文件夹下
+    /// </remarks>
+    /// <param name="filePath">文件绝对路径</param>
     /// <exception cref="ParseException"></exception>
-    /// <exception cref="FileNotFoundException"></exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
     public void SetUnitInfo(string filePath)
     {
-        _armyUnitInfo = new ArmyUnitInfo(filePath);
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"{filePath} 不存在");
+        }
+        _armyUnitInfo = new ArmyUnitInfo(filePath, Tag);
+    }
+
+    public void SetMapColor(byte red, byte green, byte blue)
+    {
+        MapColor = new SKColor(red, green, blue);
     }
 }

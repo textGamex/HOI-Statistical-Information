@@ -12,7 +12,7 @@ namespace HOI_Message.Logic.Util.CWTool;
 /// <summary>
 /// CWTools的适配器.
 /// </summary>
-internal class CWToolsAdapter
+public class CWToolsAdapter
 {
     public EventRoot Root { get; }
     public bool IsSuccess { get; }
@@ -46,14 +46,7 @@ internal class CWToolsAdapter
 
     private CWToolsAdapter(CharParsers.ParserResult<Types.ParsedFile, Microsoft.FSharp.Core.Unit> eventRoot)
     {
-        if (eventRoot.IsSuccess)
-        {
-            Root = processEventFile(eventRoot.GetResult());
-        }
-        else
-        {
-            Root = new EventRoot(string.Empty, null);
-        }
+        Root = eventRoot.IsSuccess ? processEventFile(eventRoot.GetResult()) : new EventRoot(string.Empty, null);
         IsSuccess = eventRoot.IsSuccess;
         ErrorMessage = eventRoot.GetError();
     }

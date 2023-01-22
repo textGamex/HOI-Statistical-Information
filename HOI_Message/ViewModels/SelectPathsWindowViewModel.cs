@@ -50,7 +50,7 @@ namespace HOI_Message.ViewModels
 
         private readonly Dictionary<DataPaths, string> _dataPathMap = new(8);
 
-        private List<StateInfo>? _statesInfo = null;
+        private List<StateInfo>? _statesInfo;
 
         private GameLocalisation _localisation = GameLocalisation.Empty;
 
@@ -148,16 +148,14 @@ namespace HOI_Message.ViewModels
             WeakReferenceMessenger.Default.Send(string.Empty, EventId.ParseDataSuccess);
         }
 
-        private async void AddStateData(string folderPath)
+        private void AddStateData(string folderPath)
         {
             var dir = new DirectoryInfo(folderPath);
             var files = dir.GetFiles();
             _statesInfo = new List<StateInfo>(files.Length);
 
-            uint count = 0;
             foreach (var file in files)
             {
-                count++;
                 try
                 {
                     var state = new StateInfo(file.FullName);
@@ -167,6 +165,7 @@ namespace HOI_Message.ViewModels
                 {
                     _logger.Warn(ex);
                 }
+
                 //刷新进度条                               
                 double progressBarValue = (_statesInfo.Count / (double)files.Length) * 100;
                 WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file.FullName), EventId.UpdateParseProgressBar);
@@ -238,6 +237,7 @@ namespace HOI_Message.ViewModels
 
                 if (!File.Exists(oobFilePath))
                 {
+                    _logger.Warn("文件 '{0}' 不存在", oobFilePath);
                     continue;
                 }
                 try
@@ -280,7 +280,7 @@ namespace HOI_Message.ViewModels
                     byte blue = byte.Parse(colorData[2].Value.ToRawString());
                     if (_nationalInfoMap.TryGetValue(item.Key, out var country))
                     {
-                        country.MapColor = new SkiaSharp.SKColor(red, green, blue);
+                        country.SetMapColor(red, green, blue);
                     }
                     else
                     {

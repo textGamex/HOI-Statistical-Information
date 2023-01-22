@@ -9,116 +9,119 @@ using HOI_Message.Logic.CustomException;
 
 namespace HOI_Message.Logic.State;
 
-internal class StateFileParser
+public partial class StateInfo
 {
-    private readonly CWToolsAdapter _root;
-    private readonly Node _state;
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-    private class Key
+    private class StateFileParser
     {
-        public const string State = "state";
-        public const string Id = "id";
-        public const string History = "history";
-        public const string OwnerTag = "owner";
-        public const string Manpower = "manpower";
-        public const string AddCore = "add_core_of";
-        public const string Resources = "resources";
-        public const string Buildings = "buildings";
-        public const string Name = "name";
-    }
+        private readonly CWToolsAdapter _root;
+        private readonly Node _state;
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-    /// <summary>
-    /// 按文件绝对路径解析
-    /// </summary>
-    /// <remarks>
-    /// 地块文件在 Hearts of Iron IV\history\states 下
-    /// </remarks>
-    /// <param name="filePath">地块的绝对路径</param>
-    /// <exception cref="ParseException">当文件解析失败时</exception>
-    /// <exception cref="ArgumentException">当文件为空时</exception>
-    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-    public StateFileParser(string filePath)
-    {
-        var adapter = new CWToolsAdapter(filePath);
-        if (adapter.IsSuccess)
+        private static class Key
         {
-            _root = adapter;
-        }
-        else
-        {
-            throw new ParseException($"文件解析错误, 路径: {filePath},错误信息:{adapter.ErrorMessage}");
+            public const string State = "state";
+            public const string Id = "id";
+            public const string History = "history";
+            public const string OwnerTag = "owner";
+            public const string Manpower = "manpower";
+            public const string AddCore = "add_core_of";
+            public const string Resources = "resources";
+            public const string Buildings = "buildings";
+            public const string Name = "name";
         }
 
-        if (_root.Root.Has(Key.State))
+        /// <summary>
+        /// 按文件绝对路径解析
+        /// </summary>
+        /// <remarks>
+        /// 地块文件在 Hearts of Iron IV\history\states 下
+        /// </remarks>
+        /// <param name="filePath">地块的绝对路径</param>
+        /// <exception cref="ParseException">当文件解析失败时</exception>
+        /// <exception cref="ArgumentException">当文件为空时</exception>
+        /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+        public StateFileParser(string filePath)
         {
-            _state = _root.Root.Child(Key.State).Value;
-        }
-        else
-        {
-            throw new ArgumentException($"文件为空, 路径: {filePath}");
-        }
-    }
-
-    public int GetId()
-    {
-        if (_state.Has(Key.Id))
-        {
-            var ids = _state.Leafs(Key.Id);
-            if (ids.Count() != 1)
+            var adapter = new CWToolsAdapter(filePath);
+            if (adapter.IsSuccess)
             {
-                _logger.Warn("{0} 不唯一", Key.Id);
+                _root = adapter;
+            }
+            else
+            {
+                throw new ParseException($"文件解析错误, 路径: {filePath},错误信息:{adapter.ErrorMessage}");
             }
 
-            string value = ids.Last().Value.ToRawString();
-            try
+            if (_root.Root.Has(Key.State))
             {
-                return int.Parse(value);
+                _state = _root.Root.Child(Key.State).Value;
             }
-            catch (FormatException ex)
+            else
             {
-                _logger.Error(ex, "进行转换的值: {0}", value);
-                throw ex;
+                throw new ArgumentException($"文件为空, 路径: {filePath}");
             }
         }
-        else
-        {
-            throw new ArgumentException($"缺少: {Key.Id}");
-        }
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public string GetOwnerTag()
-    {
-        if (TryGetHistoryNode(out var history) && history.Has(Key.OwnerTag))
+        public int GetId()
         {
-            var ownerTags = history.Leafs(Key.OwnerTag);
-            if (ownerTags.Count() != 1)
+            if (_state.Has(Key.Id))
             {
-                _logger.Warn("{0} 不唯一", Key.OwnerTag);
+                var ids = _state.Leafs(Key.Id);
+                if (ids.Count() != 1)
+                {
+                    _logger.Warn("{0} 不唯一", Key.Id);
+                }
+
+                string value = ids.Last().Value.ToRawString();
+                try
+                {
+                    return int.Parse(value);
+                }
+                catch (FormatException ex)
+                {
+                    _logger.Error(ex, "进行转换的值: {0}", value);
+                    throw ex;
+                }
             }
-            var ownerTag = ownerTags.Last().Value.ToRawString();
-            return ownerTag;
+            else
+            {
+                throw new ArgumentException($"缺少: {Key.Id}");
+            }
         }
-        else
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public string GetOwnerTag()
         {
+            if (TryGetHistoryNode(out var history) && history.Has(Key.OwnerTag))
+            {
+                var ownerTags = history.Leafs(Key.OwnerTag);
+                if (ownerTags.Count() != 1)
+                {
+                    _logger.Warn("{0} 不唯一", Key.OwnerTag);
+                }
+                var ownerTag = ownerTags.Last().Value.ToRawString();
+                return ownerTag;
+            }
+
             throw new ArgumentException($"缺少: {Key.OwnerTag}");
         }
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="FormatException"></exception>
-    public uint GetManpower()
-    {
-        if (_state.Has(Key.Manpower))
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="FormatException"></exception>
+        public uint GetManpower()
         {
+            if (!_state.Has(Key.Manpower))
+            {
+                throw new ArgumentException($"缺少: {Key.Manpower}");
+            }
+
             var manpowerList = _state.Leafs(Key.Manpower);
             if (manpowerList.Count() != 1)
             {
@@ -136,108 +139,102 @@ internal class StateFileParser
                 throw ex;
             }
         }
-        else
-        {
-            throw new ArgumentException("缺少: {0}", Key.Manpower);
-        }
-    }
 
-    public IList<string> GetHasCoreCountryTags()
-    {
-        var tags = new List<string>(8);            
-        if (TryGetHistoryNode(out var history) && history.Has(Key.AddCore))
+        public IList<string> GetHasCoreCountryTags()
         {
-            foreach (var leaf in history.Leafs(Key.AddCore))
+            var tags = new List<string>(8);
+            if (TryGetHistoryNode(out var history) && history.Has(Key.AddCore))
             {
-                tags.Add(leaf.Value.ToRawString().Trim());
+                foreach (var leaf in history.Leafs(Key.AddCore))
+                {
+                    tags.Add(leaf.Value.ToRawString().Trim());
+                }
+                tags.TrimExcess();
             }
-            tags.TrimExcess();
+            return tags;
         }
-        return tags;
-    }
 
-    /// <summary>
-    /// 尝试获得<c>history</c>节点, 如果有多个, 返回最后一个.
-    /// </summary>
-    /// <param name="node"><c>history</c>节点</param>
-    /// <returns>如果成功, 返回<c>true</c>, 否则, 返回<c>false</c>.</returns>
-    private bool TryGetHistoryNode(out Node node)
-    {
-        if (_state.Has(Key.History))
+        /// <summary>
+        /// 尝试获得<c>history</c>节点, 如果有多个, 返回最后一个.
+        /// </summary>
+        /// <param name="node"><c>history</c>节点</param>
+        /// <returns>如果成功, 返回<c>true</c>, 否则, 返回<c>false</c>.</returns>
+        private bool TryGetHistoryNode(out Node node)
         {
-            var histories = _state.Childs(Key.History);
-            if (histories.Count() != 1)
+            if (_state.Has(Key.History))
             {
-                _logger.Warn("{}不唯一", Key.History);
+                var histories = _state.Childs(Key.History);
+                if (histories.Count() != 1)
+                {
+                    _logger.Warn("{0}不唯一", Key.History);
+                }
+                node = histories.Last();
+                return true;
             }
-            node = histories.Last();
-            return true;
-        }
-        else
-        {
-            node = Node.Create(string.Empty);                
+
+            node = Node.Create(string.Empty);
             return false;
         }
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="FormatException"></exception>        
-    public IDictionary<string, ushort> GetResourcesMap()
-    {
-        var map = new Dictionary<string, ushort>(8);
-        if (_state.Has(Key.Resources))
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="FormatException"></exception>        
+        public IDictionary<string, ushort> GetResourcesMap()
         {
-            var resources = _state.Child(Key.Resources).Value;
-            foreach (var item in resources.Leaves)
+            var map = new Dictionary<string, ushort>(8);
+            if (_state.Has(Key.Resources))
             {
-                // 为了去除小数点
-                var temp = double.Parse(item.Value.ToRawString()).ToString("F0");
-                ushort value = ushort.Parse(temp);
-                map.Add(item.Key, value);
+                var resources = _state.Child(Key.Resources).Value;
+                foreach (var item in resources.Leaves)
+                {
+                    // 为了去除小数点
+                    var temp = double.Parse(item.Value.ToRawString()).ToString("F0");
+                    ushort value = ushort.Parse(temp);
+                    map.Add(item.Key, value);
+                }
             }
+            map.TrimExcess();
+            return map;
         }
-        map.TrimExcess();
-        return map;
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>        
-    /// <returns></returns>
-    /// <exception cref="FormatException"></exception>       
-    public IDictionary<string, byte> GetBuildingLevelMap()
-    {
-        //TODO: 暂未实现省份建筑
-        var map = new Dictionary<string, byte>(8);
-
-        if (TryGetHistoryNode(out var history) && history.Has(Key.Buildings))
+        /// <summary>
+        /// 
+        /// </summary>        
+        /// <returns></returns>
+        /// <exception cref="FormatException"></exception>       
+        public IDictionary<string, byte> GetBuildingLevelMap()
         {
-            var buildingsNode = history.Child(Key.Buildings).Value;
-            foreach (var item in buildingsNode.Leaves)
+            //TODO: 暂未实现省份建筑
+            var map = new Dictionary<string, byte>(8);
+
+            if (TryGetHistoryNode(out var history) && history.Has(Key.Buildings))
             {
-                var value = byte.Parse(item.Value.ToRawString());
-                map.Add(item.Key, value);
+                var buildingsNode = history.Child(Key.Buildings).Value;
+                foreach (var item in buildingsNode.Leaves)
+                {
+                    var value = byte.Parse(item.Value.ToRawString());
+                    map.Add(item.Key, value);
+                }
             }
+            return map;
         }
-        return map;
-    }
 
-    public string GetName()
-    {
-        if (!_state.Has(Key.Name))
+        public string GetName()
         {
-            return string.Empty;
-        }
-        var leafs = _state.Leafs(Key.Name);
-        if (leafs.Count() != 1)
-        {
-            _logger.Warn("{0} 不唯一", Key.Name);
-        }
-        var nameLeaf = leafs.Last();
+            if (!_state.Has(Key.Name))
+            {
+                return string.Empty;
+            }
+            var leafs = _state.Leafs(Key.Name);
+            if (leafs.Count() != 1)
+            {
+                _logger.Warn("{0} 不唯一", Key.Name);
+            }
+            var nameLeaf = leafs.Last();
 
-        return nameLeaf.Value.ToString();
+            return nameLeaf.Value.ToString();
+        }
     }
 }
