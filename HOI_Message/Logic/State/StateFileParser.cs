@@ -234,7 +234,7 @@ public partial class StateInfo
             }
             var nameLeaf = leafs.Last();
 
-            return nameLeaf.Value.ToString();
+            return nameLeaf.Value.ToRawString();
         }
     }
 }
