@@ -1,38 +1,38 @@
 ﻿using NLog;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using static HOI_Message.Logic.Localisation.LocalisationData;
+using static HOI_Message.Logic.Localisation.LocalisationParser;
 
 namespace HOI_Message.Logic.Localisation;
 
 public sealed class GameLocalisation
 {
-    private readonly IDictionary<string, Data> _datas = new Dictionary<string, Data>();
+    private readonly IDictionary<string, LineData> _datas = new Dictionary<string, LineData>();
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    public static GameLocalisation Empty => _empty;
-    private readonly static GameLocalisation _empty = new();
 
-    private GameLocalisation()
+    public GameLocalisation()
     {
 
     }
 
-    //public GameLocalisation(string folderPath)
-    //{
-    //    var files = new DirectoryInfo(folderPath).GetFiles(".", SearchOption.AllDirectories);
-    //    _datas = GetDatas(files.Select(x => x.FullName));
-    //}
-
-    public GameLocalisation(IDictionary<string, Data> datas)
+    public void AddByFilePath(string filePath)
     {
-        _datas = datas;
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"{filePath} 不存在");
+        }
+        var data = new LocalisationParser(filePath);
+        AddToMap(data.AllData);
     }
 
-    public static void AddDataToMap(IDictionary<string, Data> map, string filePath)
+    public void AddByMap(IDictionary<string, LineData> map)
     {
-        var data = new LocalisationData(filePath);
-        foreach (var item in data.AllData)
+        AddToMap(map);
+    }
+
+    private void AddToMap(IDictionary<string, LineData> map)
+    {
+        foreach (var item in map)
         {
 #if DEBUG
             if (item.Key != item.Value.Key)
@@ -40,11 +40,11 @@ public sealed class GameLocalisation
                 _logger.Warn("错误的Key, 应为:'{0}', 结果:'{1}'", item.Key, item.Value.Key);
             }
 #endif
-            if (map.TryGetValue(item.Key, out var oldData))
+            if (_datas.TryGetValue(item.Key, out var oldData))
             {
                 if (item.Value.Level > oldData.Level)
                 {
-                    map[item.Key] = item.Value;
+                    _datas[item.Key] = item.Value;
                 }
                 else if (item.Value.Level == oldData.Level)
                 {
@@ -57,7 +57,7 @@ public sealed class GameLocalisation
             }
             else
             {
-                map.Add(item.Key, item.Value);
+                _datas.Add(item.Key, item.Value);
             }
         }
     }

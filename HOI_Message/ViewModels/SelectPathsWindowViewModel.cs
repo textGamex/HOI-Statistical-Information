@@ -16,7 +16,6 @@ using HOI_Message.Logic.Localisation;
 using HOI_Message.Logic.State;
 using HOI_Message.Logic.Util.CWTool;
 using NLog;
-using static HOI_Message.Logic.Localisation.LocalisationData;
 using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace HOI_Message.ViewModels
@@ -46,13 +45,13 @@ namespace HOI_Message.ViewModels
         private string modTags = string.Empty;
 
         [ObservableProperty]
-        private double parseProgressBarValue = 0.0;
+        private double parseProgressBarValue;
 
         private readonly Dictionary<DataPaths, string> _dataPathMap = new(8);
 
         private List<StateInfo>? _statesInfo;
 
-        private GameLocalisation _localisation = GameLocalisation.Empty;
+        private readonly GameLocalisation _localisation = new();
 
         /// <summary>
         /// Key是国家Tag, Value是国家信息
@@ -176,12 +175,11 @@ namespace HOI_Message.ViewModels
         private void AddLocalisationData(string folderPath)
         {
             var files = new DirectoryInfo(folderPath).GetFiles(".", SearchOption.AllDirectories);
-            var map = new Dictionary<string, Data>();
             uint count = 0;
 
             foreach (var file in files)
             {
-                GameLocalisation.AddDataToMap(map, file.FullName);
+                _localisation.AddByFilePath(file.FullName);
                 ++count;
 
                 //刷新进度条
@@ -189,13 +187,12 @@ namespace HOI_Message.ViewModels
                 WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file.FullName), EventId.UpdateParseProgressBar);
                 ParseItemNumberLabel = $"{count} / {files.Length}";
             }
-            _localisation = new GameLocalisation(map);
         }
 
         private void AddCountriesInfo(string gameRootPath)
         {
             var countriesTagsMap = NationalInfo.GetAllCountriesTag(gameRootPath);
-            var nationalStatesMap = NationalInfo.ClassifyStates(_statesInfo ?? throw new Exception());
+            var nationalStatesMap = NationalInfo.ClassifyStates(_statesInfo ?? throw new ArgumentNullException(nameof(_statesInfo)));
             uint count = 0;
 
             var emptyStatesList = new List<StateInfo>();
