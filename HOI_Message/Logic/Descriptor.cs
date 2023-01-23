@@ -11,34 +11,28 @@ namespace HOI_Message.Logic
     {
         public string Name { get; private set; } = string.Empty;
 
+        public string SupportedVersion { get; } = string.Empty;
         public string Version { get; } = string.Empty;
 
         public IEnumerable<string> Tags { get; } = Enumerable.Empty<string>();
 
         public string PictureName { get; } = string.Empty;
 
-        /// <summary>
-        /// 按文件绝对路径构建
-        /// </summary>
-        /// <param name="modDescriptorPath">mod描述文件绝对路径</param>
-        /// <exception cref="ParseException">当文件解析失败时</exception>
-        /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-        public Descriptor(string modDescriptorPath)
+        public Descriptor(string fileName, string text)
         {
-            var fileText = File.ReadAllText(modDescriptorPath);
-            var root = new CWToolsAdapter(Path.GetFileName(modDescriptorPath), fileText);
+            var root = new CWToolsAdapter(fileName, text);
             if (!root.IsSuccess)
             {
-                throw new ParseException($"无法解析文件, path: {modDescriptorPath}, 错误信息: {root.ErrorMessage}");
+                throw new ParseException($"无法解析 descriptor.mod 文件, 错误信息: {root.ErrorMessage}");
             }
 
             var result = root.Root.Leaves;
 
             foreach (var item in result)
             {
-                if (item.Key == Key.Version)
+                if (item.Key == Key.SupportedVersion)
                 {
-                    Version = item.Value.ToRawString();
+                    SupportedVersion = item.Value.ToRawString();
                 }
 
                 if (item.Key == Key.Picture)
@@ -46,19 +40,29 @@ namespace HOI_Message.Logic
                     PictureName = item.Value.ToRawString();
                 }
 
-                if (Version != null && PictureName != null)
+                if (item.Key == Key.Version)
                 {
-                    break;
+                    Version = item.Value.ToRawString();
                 }
             }
 
-            SetModName(fileText);
+            SetModName(text);
 
             if (root.Root.Has(Key.Tags))
             {
                 var tags = root.Root.Child(Key.Tags).Value;
                 Tags = tags.LeafValues.Select(x => x.Key);
             }
+        }
+
+        /// <summary>
+        /// 按文件绝对路径构建
+        /// </summary>
+        /// <param name="modDescriptorPath">mod描述文件绝对路径</param>
+        /// <exception cref="ParseException">当文件解析失败时</exception>
+        /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+        public Descriptor(string modDescriptorPath) : this("descriptor.mod", File.ReadAllText(modDescriptorPath))
+        {
         }
 
         private void SetModName(string fileText)
@@ -72,6 +76,7 @@ namespace HOI_Message.Logic
 
         private static class Key
         {
+            public const string SupportedVersion = "supported_version";
             public const string Version = "version";
             public const string Picture = "picture";
             public const string Tags = "tags";
