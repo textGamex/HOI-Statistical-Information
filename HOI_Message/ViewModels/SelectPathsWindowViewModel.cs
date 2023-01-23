@@ -112,7 +112,7 @@ namespace HOI_Message.ViewModels
                 ImageSource = new BitmapImage(new Uri(picturePath, UriKind.Absolute));
             }
             ModName = descriptor.Name;
-            ModVersion = descriptor.Version;
+            ModVersion = descriptor.SupportedVersion;
             ModTags = string.Join(", ", descriptor.Tags);
         }
 
