@@ -187,6 +187,7 @@ namespace HOI_Message.ViewModels
                 WeakReferenceMessenger.Default.Send(Tuple.Create(progressBarValue, file.FullName), EventId.UpdateParseProgressBar);
                 ParseItemNumberLabel = $"{count} / {files.Length}";
             }
+            _localisation.TrimExcess();
         }
 
         private void AddCountriesInfo(string gameRootPath)

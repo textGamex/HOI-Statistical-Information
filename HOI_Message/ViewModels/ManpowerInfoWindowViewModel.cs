@@ -5,7 +5,6 @@ using HOI_Message.Logic;
 using HOI_Message.Logic.Country;
 using HOI_Message.Logic.Localisation;
 using LiveChartsCore;
-using LiveChartsCore.Kernel;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;

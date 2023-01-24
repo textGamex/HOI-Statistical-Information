@@ -1,12 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
 using HOI_Message.Logic.Util.CWTool;
 using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.Country;
-using System.Collections;
 
 namespace HOI_Message.Logic.Unit;
 

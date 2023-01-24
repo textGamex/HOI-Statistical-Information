@@ -1,8 +1,4 @@
-﻿using HOI_Message.Logic.Country;
-using HOI_Message.ViewModels;
-using HOI_Message.Logic.Localisation;
-using System.Collections.Generic;
-using System.Windows;
+﻿using HOI_Message.ViewModels;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using HOI_Message.Logic;

@@ -1,12 +1,6 @@
 ﻿using HOI_Message.Logic.Country;
 using HOI_Message.Logic.Localisation;
-using HOI_Message.Logic.State;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HOI_Message.Logic;
 
@@ -17,7 +11,7 @@ public static class GameModels
     /// </summary>
     public static IReadOnlyCollection<NationalInfo> Countries => _countries.AsReadOnly();
 
-    public static GameLocalisation Localisation { get; set; } = GameLocalisation.Empty;
+    public static GameLocalisation Localisation { get; set; } = new();
 
 #pragma warning disable IDE1006 // 命名样式
     public static IList<NationalInfo> _countries { get; internal set; } = new List<NationalInfo>();

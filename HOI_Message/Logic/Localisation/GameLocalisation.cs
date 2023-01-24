@@ -7,12 +7,12 @@ namespace HOI_Message.Logic.Localisation;
 
 public sealed class GameLocalisation
 {
-    private readonly IDictionary<string, LineData> _datas = new Dictionary<string, LineData>();
+    private readonly Dictionary<string, LineData> _datas;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     public GameLocalisation()
     {
-
+        _datas = new Dictionary<string, LineData>();
     }
 
     public void AddByFilePath(string filePath)
@@ -28,6 +28,11 @@ public sealed class GameLocalisation
     public void AddByMap(IDictionary<string, LineData> map)
     {
         AddToMap(map);
+    }
+
+    public void TrimExcess()
+    {
+        _datas.TrimExcess();
     }
 
     private void AddToMap(IDictionary<string, LineData> map)
@@ -81,11 +86,9 @@ public sealed class GameLocalisation
             value = data.Value;
             return true;
         }
-        else
-        {
-            value = key;
-            return false;
-        }
+
+        value = key;
+        return false;
     }
 
     public string GetCountryName(string countryTag)
