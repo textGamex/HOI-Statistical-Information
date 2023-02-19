@@ -7,17 +7,17 @@ namespace HOI_Message_UnitTest.Logic.State
     [TestFixture]
     public class StateInfoTests
     {
-        private readonly StateInfo _stateInfo = new("Resources\\GameFile\\6-Belgium.txt");
+        private readonly StateInfo _stateInfo = new(@"Resources\GameFile\6-Belgium.txt");
 
         [Test]
-        public void PropertyTest()
+        public void TestProperty()
         {
             Multiple(() =>
             {
                 That(_stateInfo.Name, Is.EqualTo("STATE_6"));
                 That(_stateInfo.Id, Is.EqualTo(6));
                 That(_stateInfo.Manpower, Is.EqualTo(4747700));
-                That(_stateInfo.OwnerTag, Is.EqualTo("TEST"));
+                That(_stateInfo.OwnerTag.Tag, Is.EqualTo("TES"));
                 That(_stateInfo.Resources, Does.ContainKey("steel").WithValue(25));
                 That(_stateInfo.Buildings, Does.ContainKey("infrastructure").WithValue(3));
                 That(_stateInfo.Buildings, Does.ContainKey("arms_factory").WithValue(5));
@@ -27,20 +27,20 @@ namespace HOI_Message_UnitTest.Logic.State
         }
 
         [Test]
-        public void GetHasCoreTagsTest()
+        public void TestGetHasCoreTags()
         {
-            string[] tags = { "TEST" };
+            string[] tags = { "TES" };
 
             That(_stateInfo.GetHasCoreTags(), Is.EquivalentTo(tags));
         }
 
         [Test]
-        public void ThrowExceptionTest()
+        public void TestThrowException()
         {
             Multiple(() =>
             {
                 That(() => { new StateInfo(string.Empty); }, Throws.TypeOf<FileNotFoundException>());
-                That(() => { new StateInfo("Resources\\GameFile\\errorFile.txt"); }, Throws.TypeOf<ParseException>());
+                That(() => { new StateInfo(@"Resources\GameFile\errorFile.txt"); }, Throws.TypeOf<ParseException>());
             });
         }
     }

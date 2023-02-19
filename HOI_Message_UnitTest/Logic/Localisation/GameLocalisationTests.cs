@@ -43,5 +43,11 @@ namespace HOI_Message_UnitTest.Logic.Localisation
                 That(gameLocalisation.GetValue("key4"), Is.EqualTo("key4"));
             });
         }
+
+        [Test]
+        public void TestTryGetValue()
+        {
+
+        }
     }
 }

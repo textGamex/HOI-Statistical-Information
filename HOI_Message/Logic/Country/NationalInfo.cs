@@ -15,7 +15,7 @@ namespace HOI_Message.Logic.Country;
 /// </summary>
 public partial class NationalInfo
 {
-    public string Tag { get; private set; }
+    public CountryTag Tag { get; private set; }
 
     /// <summary>
     /// 一个国家的总人口
@@ -68,7 +68,7 @@ public partial class NationalInfo
     {
         if (tag is null)
         {
-            Tag = _states.Count != 0 ? _states.First().OwnerTag : "NONE";
+            Tag = _states.Count != 0 ? _states.First().OwnerTag : "ERR";
         }
         else
         {

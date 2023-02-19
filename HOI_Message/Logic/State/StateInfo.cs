@@ -10,7 +10,7 @@ namespace HOI_Message.Logic.State;
 /// </summary>
 public partial class StateInfo
 {
-    public string OwnerTag { get; }
+    public CountryTag OwnerTag { get; }
     public int Id { get; }
     public string Name { get; }
     public uint Manpower { get; }

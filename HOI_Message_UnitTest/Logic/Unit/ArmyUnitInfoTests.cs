@@ -12,7 +12,7 @@ namespace HOI_Message_UnitTest.Logic.Unit
             Multiple(() =>
             {
                 That(ArmyUnitInfo.Empty.UnitSum, Is.EqualTo(0));
-                That(ArmyUnitInfo.Empty.OwnCountryTag, Is.EqualTo(string.Empty));
+                That(ArmyUnitInfo.Empty.OwnCountryTag.Tag, Is.EqualTo(string.Empty));
             });
         }
 
@@ -23,7 +23,7 @@ namespace HOI_Message_UnitTest.Logic.Unit
 
             Multiple(() =>
             {
-                That(armyUnitInfo.OwnCountryTag, Is.EqualTo("TES"));
+                That(armyUnitInfo.OwnCountryTag.Tag, Is.EqualTo("TES"));
                 That(armyUnitInfo.UnitSum, Is.EqualTo(1));
             });
         }
