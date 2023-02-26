@@ -41,11 +41,6 @@ public readonly struct CountryTag : IEquatable<CountryTag>
         return tag.Tag;
     }
 
-    public static implicit operator CountryTag(string tag)
-    {
-        return new CountryTag(tag);
-    }
-
     public override int GetHashCode()
     {
         return HashCode.Combine(_tagsChars[0], _tagsChars[1], _tagsChars[2]);

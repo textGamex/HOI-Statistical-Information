@@ -45,9 +45,9 @@ namespace HOI_Message_UnitTest.Logic
                 That(() => { new CountryTag("1234"); }, Throws.TypeOf<ArgumentException>());
                 That(() => { new CountryTag("12"); }, Throws.TypeOf<ArgumentException>());
                 That(() => { new CountryTag("123"); }, Throws.Nothing);
-                That(() => { CountryTag stringToCountryTag = "12"; }, Throws.TypeOf<ArgumentException>());
-                That(() => { CountryTag stringToCountryTag = "1234"; }, Throws.TypeOf<ArgumentException>());
-                That(() => { CountryTag stringToCountryTag = "123"; }, Throws.Nothing);
+                That(() => { new CountryTag("12"); }, Throws.TypeOf<ArgumentException>());
+                That(() => { new CountryTag("1234"); }, Throws.TypeOf<ArgumentException>());
+                That(() => { new CountryTag("123"); }, Throws.Nothing);
             });
         }
 

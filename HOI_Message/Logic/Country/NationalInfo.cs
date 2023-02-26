@@ -68,11 +68,11 @@ public partial class NationalInfo
     {
         if (tag is null)
         {
-            Tag = _states.Count != 0 ? _states.First().OwnerTag : "ERR";
+            Tag = _states.Count != 0 ? _states.First().OwnerTag : new CountryTag("ERR");
         }
         else
         {
-            Tag = tag;
+            Tag = new CountryTag(tag);
         }
     }
 

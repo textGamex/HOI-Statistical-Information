@@ -46,7 +46,7 @@ public class ArmyUnitInfo : UnitInfoBase
             return;
         }
 
-        OwnCountryTag = countryTag;
+        OwnCountryTag = new CountryTag(countryTag);
         // 添加所有部队模板
         var map = new Dictionary<string, ushort>();
         var unitTemplates = root.Root.Childs(Key.DivisionTemplate);

@@ -17,7 +17,7 @@ public partial class StateInfo
     public IReadOnlyDictionary<string, byte> Buildings => _buildingMap.AsReadOnly();
     public IReadOnlyDictionary<string, ushort> Resources => _resourcesMap.AsReadOnly();
 
-    private readonly IList<string> _hasCoreTags;
+    private readonly IList<CountryTag> _hasCoreTags;
     private readonly IDictionary<string, ushort> _resourcesMap;
     private readonly IDictionary<string, byte> _buildingMap;
     private readonly Lazy<int> _hashCode;
@@ -34,7 +34,7 @@ public partial class StateInfo
 
         Id = parser.GetId();
         Name = parser.GetName();
-        OwnerTag = parser.GetOwnerTag();
+        OwnerTag = new CountryTag(parser.GetOwnerTag());
         Manpower = parser.GetManpower();
         _hasCoreTags = parser.GetHasCoreCountryTags();
         _resourcesMap = parser.GetResourcesMap();
@@ -43,7 +43,7 @@ public partial class StateInfo
         _hashCode = new Lazy<int>(GetHashCodeLazy);
     }
 
-    public IEnumerable<string> GetHasCoreTags()
+    public IEnumerable<CountryTag> GetHasCoreTags()
     {
         return _hasCoreTags;
     }
@@ -78,7 +78,7 @@ public partial class StateInfo
         int hash = 0;
         foreach (var item in _hasCoreTags)
         {
-            hash = hash * 31 + item?.GetHashCode() ?? 0;
+            hash = hash * 31 + item.GetHashCode();
         }
         return hash;
     }

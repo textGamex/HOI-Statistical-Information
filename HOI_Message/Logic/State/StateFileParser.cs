@@ -140,14 +140,14 @@ public partial class StateInfo
             }
         }
 
-        public IList<string> GetHasCoreCountryTags()
+        public IList<CountryTag> GetHasCoreCountryTags()
         {
-            var tags = new List<string>(8);
+            var tags = new List<CountryTag>(8);
             if (TryGetHistoryNode(out var history) && history.Has(Key.AddCore))
             {
                 foreach (var leaf in history.Leafs(Key.AddCore))
                 {
-                    tags.Add(leaf.Value.ToRawString().Trim());
+                    tags.Add(new CountryTag(leaf.Value.ToRawString().Trim()));
                 }
                 tags.TrimExcess();
             }
