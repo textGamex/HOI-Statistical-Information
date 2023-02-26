@@ -13,9 +13,9 @@ namespace HOI_Message.Logic.Unit;
 /// </summary>
 /// <see cref="NationalInfo"/>
 public class ArmyUnitInfo : UnitInfoBase
-{ 
+{
     public override int UnitSum => _map.Values.Sum(x => x.Count);
-    public override CountryTag OwnCountryTag { get; } = string.Empty;
+    public override CountryTag OwnCountryTag { get; } = CountryTag.Empty;
     public static ArmyUnitInfo Empty { get; } = new();
 
     // Key是模板名称

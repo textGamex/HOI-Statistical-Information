@@ -4,19 +4,25 @@ namespace HOI_Message.Logic;
 
 public readonly struct CountryTag : IEquatable<CountryTag>
 {
-    private readonly char[]? _tagsChars;
+    public static readonly CountryTag Empty = new(new string(' ', 3));
+    private readonly char[] _tagsChars;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <exception cref="ArgumentException">不合规的Tag</exception>
     public CountryTag(string tag)
     {
         if (tag == string.Empty)
         {
-            _tagsChars = null;
-            return;
+            throw new ArgumentException("禁止空字符串");
         }
         if (tag.Length != 3)
         {
-            throw new ArgumentException(tag, nameof(tag));
+            throw new ArgumentException($"Tag不合规, '{tag}' 长度不等于 3");
         }
+
         _tagsChars = new char[3];
         _tagsChars[0] = tag[0];
         _tagsChars[1] = tag[1];
@@ -42,7 +48,7 @@ public readonly struct CountryTag : IEquatable<CountryTag>
 
     public override int GetHashCode()
     {
-        return _tagsChars is null ? 0 : HashCode.Combine(_tagsChars[0], _tagsChars[1], _tagsChars[2]);
+        return HashCode.Combine(_tagsChars[0], _tagsChars[1], _tagsChars[2]);
     }
 
     public bool Equals(CountryTag other)

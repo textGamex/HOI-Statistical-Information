@@ -34,6 +34,7 @@ namespace HOI_Message_UnitTest.Logic.Unit
             Multiple(() =>
             {
                 That(() => { new ArmyUnitInfo("ErrorPath", "TEX"); }, Throws.TypeOf<FileNotFoundException>());
+                That(() => { new ArmyUnitInfo(@"Resources\GameFile\LUX_1936.txt", "TEX"); }, Throws.Nothing);
             });
         }
     }

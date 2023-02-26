@@ -7,6 +7,7 @@
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Nullable>enable</Nullable>
+      <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\Fonts\JetBrains Mono NL Medium Nerd Font Complete Windows Compatible.ttf" />
@@ -16,19 +17,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CWTools" Version="0.3.0" />
-    <PackageReference Include="FSharp.Core" Version="7.0.0" />
+    <PackageReference Include="FSharp.Core" Version="7.0.200" />
     <PackageReference Include="HandyControl" Version="3.4.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.700" />
-    <PackageReference Include="NLog" Version="5.1.1" />
+    <PackageReference Include="NLog" Version="5.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Image\ManpowerIcon.png">

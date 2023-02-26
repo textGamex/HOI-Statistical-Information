@@ -104,7 +104,7 @@ public partial class NationalInfo
 
     private NationalInfo()
     {
-        Tag = string.Empty;
+        Tag = CountryTag.Empty;
         OOBName = string.Empty;
         RulingParty = string.Empty;
         _states = new List<StateInfo>();
