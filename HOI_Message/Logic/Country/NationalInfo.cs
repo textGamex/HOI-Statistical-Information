@@ -7,6 +7,7 @@ using HOI_Message.Logic.State;
 using HOI_Message.Logic.Unit;
 using HOI_Message.Logic.Util.CWTool;
 using SkiaSharp;
+using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
 
 namespace HOI_Message.Logic.Country;
 
@@ -170,12 +171,17 @@ public partial class NationalInfo
             {
                 throw new ParseException();
             }
-            foreach (var leaf in root.Root.Leaves)
+
+            if (root.Root.Has("dynamic_tags"))
             {
-                if (leaf.Key == "dynamic_tags")
+                if (root.Root.Leafs("dynamic_tags").First().Value.ToRawString() == "yes")
                 {
                     continue;
                 }
+            }
+
+            foreach (var leaf in root.Root.Leaves)
+            {
                 var paths = leaf.Value.ToRawString().Split('/');
                 map[leaf.Key] = Path.Combine(gameRootPath, Common, paths[0], paths[1]);
             }
