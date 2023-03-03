@@ -2,8 +2,9 @@
 
 public class ErrorInfo
 {
-    private string _filePath;
     public string Message { get; }
-    public uint LinesCount { get; }
-    public ErrorTypes ErrorTypes { get; }
+    public uint Line { get; }
+    public ErrorTypes Type { get; }
+
+    private string _filePath;
 }

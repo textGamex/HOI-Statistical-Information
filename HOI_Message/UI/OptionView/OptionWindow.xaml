@@ -67,6 +67,8 @@
                 </hc:SideMenuItem.Icon>
             </hc:SideMenuItem>
 
+            <hc:SideMenuItem Command="{Binding ClickMenuAppInfoOptionCommand}" Header="软件信息" />
+
         </hc:SideMenu>
 
         <Grid x:Name="MainMessageShowGrid" Grid.Column="1" />

@@ -48,5 +48,11 @@ public partial class OptionWindow
             this.MainMessageShowGrid.Children.Clear();
             _ = this.MainMessageShowGrid.Children.Add(new CountriesInfoOptionView());
         });
+
+        WeakReferenceMessenger.Default.Register<string, byte>(this, EventId.ClickAppInfoOption, (_, _) =>
+        {
+            this.MainMessageShowGrid.Children.Clear();
+            _ = this.MainMessageShowGrid.Children.Add(new AppInfoView());
+        });
     }
 }

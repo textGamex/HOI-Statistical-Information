@@ -13,7 +13,7 @@ public readonly struct CountryTag : IEquatable<CountryTag>
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="tag"></param>
+    /// <param name="tag">长度为3的字符串</param>
     /// <exception cref="ArgumentException">不合规的Tag</exception>
     public CountryTag(string tag)
     {

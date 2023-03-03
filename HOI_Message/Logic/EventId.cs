@@ -56,5 +56,10 @@
         public const byte ClickMenuCountriesInfoOption = 9;
 
         public const byte ShowCountriesInfoWindow = 10;
+
+        /// <summary>
+        /// 点击应用信息选项时触发
+        /// </summary>
+        public const byte ClickAppInfoOption = 11;
     }
 }

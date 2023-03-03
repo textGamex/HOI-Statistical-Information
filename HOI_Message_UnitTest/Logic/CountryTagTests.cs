@@ -56,12 +56,15 @@ namespace HOI_Message_UnitTest.Logic
         {
             var tag = new CountryTag("tag");
             var equalTag = new CountryTag("tag");
-            var equalNotTag = new CountryTag("000");
+            var equalNotTag1 = new CountryTag("000");
+            var equalNotTag2 = new CountryTag("001");
 
             Multiple(() =>
             {
                 That(tag.GetHashCode(), Is.EqualTo(equalTag.GetHashCode()));
-                That(tag.GetHashCode(), Is.Not.EqualTo(equalNotTag.GetHashCode()));
+                That(tag.GetHashCode(), Is.Not.EqualTo(equalNotTag1.GetHashCode()));
+                That(tag.GetHashCode(), Is.Not.EqualTo(equalNotTag2.GetHashCode()));
+                That(equalNotTag1.GetHashCode(), Is.Not.EqualTo(equalNotTag2.GetHashCode()));
             });
         }
 
