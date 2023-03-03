@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -107,12 +108,15 @@ public partial class SelectPathsWindow
             }
 
             var countriesTagInfo = adapter.Root.Leaves;
-            foreach (var info in countriesTagInfo)
+            if (adapter.Root.Has("dynamic_tags"))
             {
-                if (info.Key == "dynamic_tags")
+                if (adapter.Root.Leafs("dynamic_tags").First().Value.ToRawString() == "yes")
                 {
                     continue;
                 }
+            }
+            foreach (var info in countriesTagInfo)
+            {
                 var partialPath = info.Value.ToRawString().Split('/');
                 map[info.Key] = Path.Combine(gameRootPath, "history", partialPath[0], partialPath[1]);
             }
