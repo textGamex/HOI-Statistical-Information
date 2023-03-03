@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Text;
 
 namespace HOI_Message.Logic;
 
 public readonly struct CountryTag : IEquatable<CountryTag>
 {
     public static readonly CountryTag Empty = new(new string(' ', 3));
-    private readonly char[] _tagsChars;
+    private readonly byte _first;
+    private readonly byte _second;
+    private readonly byte _last;
 
     /// <summary>
     /// 
@@ -23,13 +26,12 @@ public readonly struct CountryTag : IEquatable<CountryTag>
             throw new ArgumentException($"Tag不合规, '{tag}' 长度不等于 3");
         }
 
-        _tagsChars = new char[3];
-        _tagsChars[0] = tag[0];
-        _tagsChars[1] = tag[1];
-        _tagsChars[2] = tag[2];
+        _first = (byte)tag[0];
+        _second = (byte)tag[1];
+        _last = (byte)tag[2];
     }
 
-    public string Tag => new(_tagsChars);
+    public string Tag => ASCIIEncoding.ASCII.GetString(new []{ _first, _second, _last });
 
     public override string ToString()
     {
@@ -43,7 +45,7 @@ public readonly struct CountryTag : IEquatable<CountryTag>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(_tagsChars[0], _tagsChars[1], _tagsChars[2]);
+        return HashCode.Combine(_first, _second, _last);
     }
 
     public bool Equals(CountryTag other)
@@ -55,9 +57,9 @@ public readonly struct CountryTag : IEquatable<CountryTag>
     {
         if (obj is not CountryTag tag)
             return false;
-        return tag._tagsChars[0] == _tagsChars[0] && 
-               tag._tagsChars[1] == _tagsChars[1] && 
-               tag._tagsChars[2] == _tagsChars[2];
+        return tag._first == _first && 
+               tag._second == _second && 
+               tag._last == _last;
     }
 
     public override bool Equals(object? obj)

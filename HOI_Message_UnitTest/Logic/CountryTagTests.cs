@@ -15,7 +15,7 @@ namespace HOI_Message_UnitTest.Logic
             Multiple(() =>
             {
                 That(countryTag.Tag, Is.EqualTo("TAG"));
-                That(emptyCountryTag.Tag, Is.EqualTo(string.Empty));
+                That(emptyCountryTag.Tag, Is.EqualTo("\0\0\0"));
             });
         }
 

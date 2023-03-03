@@ -1,4 +1,5 @@
-﻿using HOI_Message.Logic.CustomException;
+﻿using HOI_Message.Logic;
+using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.State;
 using Throws = NUnit.Framework.Throws;
 
@@ -29,7 +30,7 @@ namespace HOI_Message_UnitTest.Logic.State
         [Test]
         public void TestGetHasCoreTags()
         {
-            string[] tags = { "TES" };
+            CountryTag[] tags = { new("TES") };
 
             That(_stateInfo.GetHasCoreTags(), Is.EquivalentTo(tags));
         }

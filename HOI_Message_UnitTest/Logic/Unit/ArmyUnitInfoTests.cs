@@ -1,4 +1,5 @@
-﻿using HOI_Message.Logic.Unit;
+﻿using HOI_Message.Logic;
+using HOI_Message.Logic.Unit;
 using Throws = NUnit.Framework.Throws;
 
 namespace HOI_Message_UnitTest.Logic.Unit
@@ -12,7 +13,7 @@ namespace HOI_Message_UnitTest.Logic.Unit
             Multiple(() =>
             {
                 That(ArmyUnitInfo.Empty.UnitSum, Is.EqualTo(0));
-                That(ArmyUnitInfo.Empty.OwnCountryTag.Tag, Is.EqualTo(string.Empty));
+                That(ArmyUnitInfo.Empty.OwnCountryTag, Is.EqualTo(CountryTag.Empty));
             });
         }
 

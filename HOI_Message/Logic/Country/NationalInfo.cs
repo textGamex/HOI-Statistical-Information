@@ -82,9 +82,9 @@ public partial class NationalInfo
     /// <param name="states">游戏中所有地块数据</param>
     /// <returns>Key是国家 Tag, Value是国家控制的地块集合</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Dictionary<string, List<StateInfo>> ClassifyStates(IEnumerable<StateInfo> states)
+    public static Dictionary<CountryTag, List<StateInfo>> ClassifyStates(IEnumerable<StateInfo> states)
     {
-        var map = new Dictionary<string, List<StateInfo>>(128);
+        var map = new Dictionary<CountryTag, List<StateInfo>>(128);
 
         foreach (var state in states)
         {
@@ -135,16 +135,16 @@ public partial class NationalInfo
     /// <param name="gameRootPath">游戏根目录</param>
     /// <returns>Key是国家Tag, Value是国家文件绝对路径</returns>
     /// <exception cref="ArgumentException"></exception>
-    public static Dictionary<string, string> GetAllCountriesTag(string gameRootPath)
+    public static Dictionary<CountryTag, string> GetAllCountriesTag(string gameRootPath)
     {
         string folderPath = Path.Combine(gameRootPath, "history", "countries");
-        var map = new Dictionary<string, string>(128);
+        var map = new Dictionary<CountryTag, string>(128);
         var files = new DirectoryInfo(folderPath).GetFiles(".", SearchOption.AllDirectories);
 
         foreach (var file in files)
         {
-            var countryTag = file.Name[0..3];
-            map[countryTag] = file.FullName;
+            var countryTag = file.Name[..3];
+            map[new CountryTag(countryTag)] = file.FullName;
         }
 
         return map;
