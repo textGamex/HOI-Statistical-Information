@@ -13,21 +13,23 @@
     mc:Ignorable="d">
     <Grid>
         <TextBox
-            Width="185"
+            Width="220"
             Margin="65,50,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             hc:InfoElement.Title="最后编译时间"
             hc:InfoElement.TitlePlacement="Left"
+            IsReadOnly="True"
             Style="{StaticResource TextBoxExtend}"
             Text="{Binding LastCompileTime}" />
         <TextBox
-            Width="185"
+            Width="220"
             Margin="65,100,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             hc:InfoElement.Title="运行框架"
             hc:InfoElement.TitlePlacement="Left"
+            IsReadOnly="True"
             Style="{StaticResource TextBoxExtend}"
             Text="{Binding FrameworkDescription}" />
 

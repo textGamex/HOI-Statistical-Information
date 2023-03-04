@@ -8,7 +8,7 @@ namespace HOI_Message.UI;
 /// <summary>
 /// StatesMessage.xaml 的交互逻辑
 /// </summary>
-///     
+///
 public partial class StatesInfoWindow
 {
     public StatesInfoWindow()

@@ -10,12 +10,25 @@
     Title="StatesMessage"
     Width="800"
     Height="750"
+    d:DataContext="{d:DesignInstance vm:StatesMessageViewModel}"
     mc:Ignorable="d">
 
-    <UserControl xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF">
-        <lvc:PieChart
-            x:Name="StatesPieChart"
-            LegendPosition="Right"
-            Series="{Binding Series}" />
-    </UserControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Label
+            Width="800"
+            Content="{Binding StatesSum}"
+            FontSize="15" />
+
+        <UserControl xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF" Grid.Row="1">
+            <lvc:PieChart
+                x:Name="StatesPieChart"
+                LegendPosition="Right"
+                Series="{Binding Series}" />
+        </UserControl>
+    </Grid>
 </hc:Window>

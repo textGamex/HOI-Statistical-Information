@@ -1,4 +1,6 @@
-﻿namespace HOI_Message.UI
+﻿using HOI_Message.Logic;
+
+namespace HOI_Message.UI
 {
     /// <summary>
     /// CountriesInfoWindow.xaml 的交互逻辑
@@ -9,7 +11,7 @@
         {
             InitializeComponent();
 
-            this.DataContext = new ViewModels.CountriesInfoWindowViewModel();
+            this.DataContext = new ViewModels.CountriesInfoWindowViewModel(GameModels.Countries, GameModels.Localisation);
         }
     }
 }

@@ -11,11 +11,26 @@
     Title="ResourcesWindow"
     Width="800"
     Height="450"
+    d:DataContext="{d:DesignInstance vm:ResourcesWindowViewModel}"
     mc:Ignorable="d">
-    <UserControl>
-        <lvc:PieChart
-            x:Name="ResourcesPieChart"
-            LegendPosition="Right"
-            Series="{Binding Series}" />
-    </UserControl>
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Label
+            Width="800"
+            Content="{Binding TotalResources}"
+            FontSize="15" />
+
+        <UserControl Grid.Row="1">
+            <lvc:PieChart
+                x:Name="ResourcesPieChart"
+                LegendPosition="Right"
+                Series="{Binding Series}" />
+        </UserControl>
+
+    </Grid>
 </hc:Window>

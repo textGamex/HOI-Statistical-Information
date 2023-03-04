@@ -69,14 +69,19 @@ public sealed class GameLocalisation
 
     public string GetValue(string key)
     {
-        if (_datas.TryGetValue(key, out var value))
+        if (_datas.TryGetValue(key, out var lineData))
         {
-            return value.Value;
+            return lineData.Value;
         }
         else
         {
             return key;
         }
+    }
+
+    public string GetResourceName(string resourceType)
+    {
+        return GetValue($"PRODUCTION_MATERIALS_{resourceType.ToUpper()}");
     }
 
     public bool TryGetValue(string key, out string value)
@@ -91,7 +96,7 @@ public sealed class GameLocalisation
         return false;
     }
 
-    public string GetCountryName(string countryTag)
+    public string GetCountryName(CountryTag countryTag)
     {
         if (TryGetValue(countryTag, out var name1))
         {
@@ -115,12 +120,12 @@ public sealed class GameLocalisation
         }
     }
 
-    public string GetCountryNameByRulingParty(string countryTag, string rulingParty)
+    public string GetCountryNameByRulingParty(CountryTag countryTag, string rulingParty)
     {
         if (TryGetValue($"{countryTag}_{rulingParty}", out var name))
         {
             return name;
         }
-        return countryTag;
+        return GetCountryName(countryTag);
     }
 }

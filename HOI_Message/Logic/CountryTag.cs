@@ -6,6 +6,7 @@ namespace HOI_Message.Logic;
 public readonly struct CountryTag : IEquatable<CountryTag>
 {
     public static readonly CountryTag Empty = new(new string(' ', 3));
+
     private readonly byte _first;
     private readonly byte _second;
     private readonly byte _last;

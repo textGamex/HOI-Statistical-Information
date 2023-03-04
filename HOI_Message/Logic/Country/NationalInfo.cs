@@ -16,6 +16,10 @@ namespace HOI_Message.Logic.Country;
 /// </summary>
 public partial class NationalInfo
 {
+    /// <summary>
+    /// 保存着游戏中所有已定义的国家 Tag
+    /// </summary>
+    private static HashSet<CountryTag> _tagSet { get; } = new();
     public CountryTag Tag { get; private set; }
 
     /// <summary>
@@ -42,6 +46,7 @@ public partial class NationalInfo
     public ArmyUnitInfo ArmyUnitInfo => _armyUnitInfo;
     public SKColor? MapColor { get; private set; }
     public static NationalInfo Empty { get; } = new();
+    public IEnumerable<StateInfo> StateInfos => _states;
 
     private readonly List<StateInfo> _states;
     private readonly Lazy<long> _manpower;
@@ -131,7 +136,7 @@ public partial class NationalInfo
 
 
     /// <summary>
-    /// 获得游戏内所有国家的 Tag 和对应的文件绝对路径
+    /// 获得国家的 Tag 和对应的文件绝对路径
     /// </summary>
     /// <param name="gameRootPath">游戏根目录</param>
     /// <returns>Key是国家Tag, Value是国家文件绝对路径</returns>
@@ -157,19 +162,19 @@ public partial class NationalInfo
     /// <param name="gameRootPath"></param>
     /// <returns>Key是国家Tag, Value是国家颜色绝对路径</returns>
     /// <exception cref="ParseException"></exception>
-    public static Dictionary<string, string> GetCountriesColorFilePath(string gameRootPath)
+    public static Dictionary<CountryTag, string> GetCountriesColorFilePath(string gameRootPath)
     {
         const string Common = "common";
         var folderPath = Path.Combine(gameRootPath, Common, "country_tags");
         var files = new DirectoryInfo(folderPath).GetFiles();
-        var map = new Dictionary<string, string>();
+        var map = new Dictionary<CountryTag, string>();
 
         foreach (var file in files)
         {
             var root = new CWToolsAdapter(file.FullName);
             if (!root.IsSuccess)
             {
-                throw new ParseException();
+                throw new ParseException("解析错误", root.ErrorPosition!);
             }
 
             if (root.Root.Has("dynamic_tags"))
@@ -183,9 +188,11 @@ public partial class NationalInfo
             foreach (var leaf in root.Root.Leaves)
             {
                 var paths = leaf.Value.ToRawString().Split('/');
-                map[leaf.Key] = Path.Combine(gameRootPath, Common, paths[0], paths[1]);
+                map[new CountryTag(leaf.Key)] = Path.Combine(gameRootPath, Common, paths[0], paths[1]);
             }
         }
+
+        _tagSet.UnionWith(map.Keys);
         return map;
     }
 
@@ -210,5 +217,10 @@ public partial class NationalInfo
     public void SetMapColor(byte red, byte green, byte blue)
     {
         MapColor = new SKColor(red, green, blue);
+    }
+
+    public static bool HasTag(CountryTag tag)
+    {
+        return _tagSet.Contains(tag);
     }
 }
