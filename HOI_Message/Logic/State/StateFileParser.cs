@@ -28,6 +28,7 @@ public partial class StateInfo
             public const string Resources = "resources";
             public const string Buildings = "buildings";
             public const string Name = "name";
+            public const string Provinces = "provinces";
         }
 
         /// <summary>
@@ -206,7 +207,6 @@ public partial class StateInfo
         /// <exception cref="FormatException"></exception>       
         public IDictionary<string, byte> GetBuildingLevelMap()
         {
-            //TODO: 暂未实现省份建筑
             var map = new Dictionary<string, byte>(8);
 
             if (TryGetHistoryNode(out var history) && history.Has(Key.Buildings))
@@ -235,6 +235,22 @@ public partial class StateInfo
             var nameLeaf = leafs.Last();
 
             return nameLeaf.Value.ToRawString();
+        }
+
+        public List<uint> GetProvinces()
+        {
+            if (!_state.Has(Key.Provinces))
+            {
+                return new List<uint>(0);
+            }
+
+            var list = new List<uint>(8);
+            foreach (var leafValue in _state.Child(Key.Provinces).Value.LeafValues)
+            {
+                list.Add(uint.Parse(leafValue.Key));
+            }
+
+            return list;
         }
     }
 }

@@ -80,23 +80,21 @@
             x:Name="ParseProgressBar"
             Width="550"
             Height="25"
-            Margin="185,272,0,0"
-            HorizontalAlignment="Left"
+            Margin="0,242,0,0"
+            HorizontalAlignment="Center"
             VerticalAlignment="Top"
             Value="{Binding ParseProgressBarValue}" />
         <Label
             x:Name="ParseProgressMesaageShowLabel"
             Width="550"
-            Margin="185,237,0,0"
-            HorizontalAlignment="Left"
+            Margin="0,207,0,0"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Left"
             Content="Label" />
         <Label
             x:Name="ParseItemNameShowLabel"
             Width="190"
-            Margin="365,317,0,0"
-            HorizontalAlignment="Left"
+            Margin="0,287,0,0"
             VerticalAlignment="Top"
             Content="{Binding ParseItemNumberLabel}" />
         <Image

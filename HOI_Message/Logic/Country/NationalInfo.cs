@@ -7,7 +7,6 @@ using HOI_Message.Logic.State;
 using HOI_Message.Logic.Unit;
 using HOI_Message.Logic.Util.CWTool;
 using SkiaSharp;
-using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
 
 namespace HOI_Message.Logic.Country;
 
@@ -174,7 +173,7 @@ public partial class NationalInfo
             var root = new CWToolsAdapter(file.FullName);
             if (!root.IsSuccess)
             {
-                throw new ParseException("解析错误", root.ErrorPosition!);
+                throw new ParseException("解析错误");
             }
 
             if (root.Root.Has("dynamic_tags"))

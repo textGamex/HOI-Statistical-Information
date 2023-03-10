@@ -6,16 +6,19 @@ using HOI_Message.Logic.CustomException;
 namespace HOI_Message.Logic.State;
 
 /// <summary>
-/// 地块信息
+/// 不可变的地块信息
 /// </summary>
 public partial class StateInfo
 {
     public CountryTag OwnerTag { get; }
+    public string FilePath { get; }
     public int Id { get; }
     public string Name { get; }
     public uint Manpower { get; }
     public IReadOnlyDictionary<string, byte> Buildings => _buildingMap.AsReadOnly();
     public IReadOnlyDictionary<string, ushort> Resources => _resourcesMap.AsReadOnly();
+    public IEnumerable<uint> Provinces => _provinces;
+    private readonly List<uint> _provinces;
 
     private readonly IList<CountryTag> _hasCoreTags;
     private readonly IDictionary<string, ushort> _resourcesMap;
@@ -30,6 +33,7 @@ public partial class StateInfo
     /// <exception cref="ParseException">当文件解析错误时</exception>
     public StateInfo(string filePath)
     {
+        FilePath = filePath;
         var parser = new StateFileParser(filePath);
 
         Id = parser.GetId();
@@ -39,6 +43,7 @@ public partial class StateInfo
         _hasCoreTags = parser.GetHasCoreCountryTags();
         _resourcesMap = parser.GetResourcesMap();
         _buildingMap = parser.GetBuildingLevelMap();
+        _provinces = parser.GetProvinces();
 
         _hashCode = new Lazy<int>(GetHashCodeLazy);
     }
@@ -59,10 +64,12 @@ public partial class StateInfo
     {
         var hash = new HashCode();
 
+        hash.Add(FilePath);
         hash.Add(Id);
         hash.Add(OwnerTag);
         hash.Add(Manpower);
         hash.Add(GetHasCoreTagsHashCode());
+        hash.Add(GetListHashCode());
         hash.Add(GetMapHashCode(_resourcesMap));
         hash.Add(GetMapHashCode(_buildingMap));
 
@@ -77,6 +84,16 @@ public partial class StateInfo
     {
         int hash = 0;
         foreach (var item in _hasCoreTags)
+        {
+            hash = hash * 31 + item.GetHashCode();
+        }
+        return hash;
+    }
+
+    private int GetListHashCode()
+    {
+        int hash = 0;
+        foreach (var item in _provinces)
         {
             hash = hash * 31 + item.GetHashCode();
         }

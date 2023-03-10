@@ -36,4 +36,10 @@ internal partial class OptionWindowViewModel : ObservableObject
     {
         WeakReferenceMessenger.Default.Send(string.Empty, EventId.ClickAppInfoOption);
     }
+
+    [RelayCommand]
+    private void ClickMenuErrorCheckOption()
+    {
+        WeakReferenceMessenger.Default.Send(string.Empty, EventId.ClickErrorCheckOption);
+    }
 }

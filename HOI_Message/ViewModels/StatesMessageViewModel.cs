@@ -52,7 +52,8 @@ public partial class StatesMessageViewModel
                     FontFamily = GlobalSettings.DefaultChartFont
                 };
                 pieSeries.DataLabelsPosition = PolarLabelsPosition.Middle;
-                pieSeries.DataLabelsFormatter = point => $"{localisation.GetCountryNameByRulingParty(country.Tag, country.RulingParty)}({point.StackedValue.Share:P2})";
+                pieSeries.DataLabelsFormatter = point => 
+                    $"{localisation.GetCountryNameByRulingParty(country.Tag, country.RulingParty)}({point.StackedValue.Share:P2})";
                 if (country.OwnStatesNumber > 30)
                 {
                     pieSeries.DataLabelsSize = 22;

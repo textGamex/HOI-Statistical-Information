@@ -61,5 +61,10 @@
         /// 点击应用信息选项时触发
         /// </summary>
         public const byte ClickAppInfoOption = 11;
+
+        /// <summary>
+        /// 点击错误分析选项时触发
+        /// </summary>
+        public const byte ClickErrorCheckOption = 12;
     }
 }

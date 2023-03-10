@@ -29,7 +29,7 @@ public class ArmyUnitInfo : UnitInfoBase
     /// <param name="countryTag">国家Tag</param>
     /// <exception cref="ParseException">当文件解析失败时</exception>
     /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-    public ArmyUnitInfo(string filePath, string countryTag)
+    public ArmyUnitInfo(string filePath, CountryTag countryTag)
     {
         if (!File.Exists(filePath))
         {
@@ -40,13 +40,14 @@ public class ArmyUnitInfo : UnitInfoBase
         {
             throw new ParseException(root.ErrorMessage);
         }
+
         if (!root.Root.Has(Key.DivisionTemplate) || !root.Root.Has(Key.Units))
         {
             _map.TrimExcess();
             return;
         }
 
-        OwnCountryTag = new CountryTag(countryTag);
+        OwnCountryTag = countryTag;
         // 添加所有部队模板
         var map = new Dictionary<string, ushort>();
         var unitTemplates = root.Root.Childs(Key.DivisionTemplate);

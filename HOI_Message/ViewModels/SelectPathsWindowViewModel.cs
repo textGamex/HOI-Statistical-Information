@@ -260,7 +260,7 @@ namespace HOI_Message.ViewModels
             {
                 if (!File.Exists(item.Value))
                 {
-                    _logger.Warn($"已定义颜色文件但未找到, path: '{item.Value}'");
+                    _logger.Warn($"已定义颜色但未找到对应文件, path: '{item.Value}'");
                     continue;
                 }
                 var parser = new CWToolsAdapter(item.Value);
