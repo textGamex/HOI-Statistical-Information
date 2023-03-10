@@ -20,7 +20,7 @@ namespace HOI_Message_UnitTest.Logic.Unit
         [Test]
         public void TestProperty()
         {
-            var armyUnitInfo = new ArmyUnitInfo(@"Resources\GameFile\LUX_1936.txt", "TES");
+            var armyUnitInfo = new ArmyUnitInfo(@"Resources\GameFile\LUX_1936.txt", new CountryTag("TES"));
 
             Multiple(() =>
             {
@@ -34,8 +34,8 @@ namespace HOI_Message_UnitTest.Logic.Unit
         {
             Multiple(() =>
             {
-                That(() => { new ArmyUnitInfo("ErrorPath", "TEX"); }, Throws.TypeOf<FileNotFoundException>());
-                That(() => { new ArmyUnitInfo(@"Resources\GameFile\LUX_1936.txt", "TEX"); }, Throws.Nothing);
+                That(() => { new ArmyUnitInfo("ErrorPath", new CountryTag("TEX")); }, Throws.TypeOf<FileNotFoundException>());
+                That(() => { new ArmyUnitInfo(@"Resources\GameFile\LUX_1936.txt", new CountryTag("TEX")); }, Throws.Nothing);
             });
         }
     }

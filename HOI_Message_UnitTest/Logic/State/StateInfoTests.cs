@@ -13,6 +13,8 @@ namespace HOI_Message_UnitTest.Logic.State
         [Test]
         public void TestProperty()
         {
+            var provinces = new uint[] { 516, 3576, 6446, 6560, 6598, 9574, 11419, 13068 };
+
             Multiple(() =>
             {
                 That(_stateInfo.Name, Is.EqualTo("STATE_6"));
@@ -24,6 +26,9 @@ namespace HOI_Message_UnitTest.Logic.State
                 That(_stateInfo.Buildings, Does.ContainKey("arms_factory").WithValue(5));
                 That(_stateInfo.Buildings, Does.ContainKey("industrial_complex").WithValue(7));
                 That(_stateInfo.Buildings, Does.ContainKey("air_base").WithValue(3));
+
+
+                That(_stateInfo.Provinces, Is.EquivalentTo(provinces));
             });
         }
 
