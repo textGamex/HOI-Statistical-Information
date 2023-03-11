@@ -38,13 +38,28 @@ namespace HOI_Message_UnitTest.Logic
         }
 
         [Test]
+        public void TestEqualsToString()
+        {
+            var str1 = "ABC";
+            var str2 = "123";
+            var str3 = "ABCDE";
+            var tag = new CountryTag(str1);
+
+            Multiple(() =>
+            {
+                That(tag.Equals(str1), Is.True);
+                That(tag.Equals(str2), Is.False);
+                That(tag.Equals(str3), Is.False);
+            });
+        }
+
+        [Test]
         public void TestThrowException()
         {
             Multiple(() =>
             {
                 That(() => { new CountryTag("1234"); }, Throws.TypeOf<ArgumentException>());
                 That(() => { new CountryTag("12"); }, Throws.TypeOf<ArgumentException>());
-                That(() => { new CountryTag("123"); }, Throws.Nothing);
                 That(() => { new CountryTag("12"); }, Throws.TypeOf<ArgumentException>());
                 That(() => { new CountryTag("1234"); }, Throws.TypeOf<ArgumentException>());
                 That(() => { new CountryTag("123"); }, Throws.Nothing);

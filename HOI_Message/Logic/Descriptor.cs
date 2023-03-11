@@ -5,81 +5,83 @@ using HOI_Message.Logic.CustomException;
 using HOI_Message.Logic.Util.CWTool;
 using System.Text.RegularExpressions;
 
-namespace HOI_Message.Logic
+namespace HOI_Message.Logic;
+
+/// <summary>
+/// MOD描述文件类
+/// </summary>
+public partial class Descriptor
 {
-    public partial class Descriptor
+    public string Name { get; private set; } = string.Empty;
+
+    public string SupportedVersion { get; } = string.Empty;
+    public string Version { get; } = string.Empty;
+
+    public IEnumerable<string> Tags { get; } = Enumerable.Empty<string>();
+
+    public string PictureName { get; } = string.Empty;
+
+    public Descriptor(string fileName, string text)
     {
-        public string Name { get; private set; } = string.Empty;
-
-        public string SupportedVersion { get; } = string.Empty;
-        public string Version { get; } = string.Empty;
-
-        public IEnumerable<string> Tags { get; } = Enumerable.Empty<string>();
-
-        public string PictureName { get; } = string.Empty;
-
-        public Descriptor(string fileName, string text)
+        var root = new CWToolsAdapter(fileName, text);
+        if (!root.IsSuccess)
         {
-            var root = new CWToolsAdapter(fileName, text);
-            if (!root.IsSuccess)
+            throw new ParseException($"无法解析 descriptor.mod 文件, 错误信息: {root.ErrorMessage}");
+        }
+
+        var result = root.Root.Leaves;
+
+        foreach (var item in result)
+        {
+            if (item.Key == Key.SupportedVersion)
             {
-                throw new ParseException($"无法解析 descriptor.mod 文件, 错误信息: {root.ErrorMessage}");
+                SupportedVersion = item.Value.ToRawString();
             }
 
-            var result = root.Root.Leaves;
-
-            foreach (var item in result)
+            if (item.Key == Key.Picture)
             {
-                if (item.Key == Key.SupportedVersion)
-                {
-                    SupportedVersion = item.Value.ToRawString();
-                }
-
-                if (item.Key == Key.Picture)
-                {
-                    PictureName = item.Value.ToRawString();
-                }
-
-                if (item.Key == Key.Version)
-                {
-                    Version = item.Value.ToRawString();
-                }
+                PictureName = item.Value.ToRawString();
             }
 
-            SetModName(text);
-
-            if (root.Root.Has(Key.Tags))
+            if (item.Key == Key.Version)
             {
-                var tags = root.Root.Child(Key.Tags).Value;
-                Tags = tags.LeafValues.Select(x => x.Key);
+                Version = item.Value.ToRawString();
             }
         }
 
-        /// <summary>
-        /// 按文件绝对路径构建
-        /// </summary>
-        /// <param name="modDescriptorPath">mod描述文件绝对路径</param>
-        /// <exception cref="ParseException">当文件解析失败时</exception>
-        /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-        public Descriptor(string modDescriptorPath) : this("descriptor.mod", File.ReadAllText(modDescriptorPath))
-        {
-        }
+        SetModName(text);
 
-        private void SetModName(string fileText)
+        if (root.Root.Has(Key.Tags))
         {
-            var result = NameRegex().Match(fileText);
-            Name = result.Value;
+            var tags = root.Root.Child(Key.Tags).Value;
+            Tags = tags.LeafValues.Select(x => x.Key);
         }
+    }
 
-        [GeneratedRegex("(?<=name.*=.*\").*(?=\")", RegexOptions.Compiled)]
-        private static partial Regex NameRegex();
+    /// <summary>
+    /// 按文件绝对路径构建
+    /// </summary>
+    /// <param name="modDescriptorPath">mod描述文件绝对路径</param>
+    /// <exception cref="ParseException">当文件解析失败时</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+    public Descriptor(string modDescriptorPath) : this("descriptor.mod", File.ReadAllText(modDescriptorPath))
+    {
+    }
 
-        private static class Key
-        {
-            public const string SupportedVersion = "supported_version";
-            public const string Version = "version";
-            public const string Picture = "picture";
-            public const string Tags = "tags";
-        }
+    private void SetModName(string fileText)
+    {
+        var result = NameRegex().Match(fileText);
+        Name = result.Value;
+    }
+
+    [GeneratedRegex("(?<=name.*=.*\").*(?=\")", RegexOptions.Compiled)]
+    private static partial Regex NameRegex();
+
+    private static class Key
+    {
+        public const string SupportedVersion = "supported_version";
+        public const string Version = "version";
+        public const string Picture = "picture";
+        public const string Tags = "tags";
     }
 }

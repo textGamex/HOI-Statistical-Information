@@ -156,10 +156,10 @@ public partial class NationalInfo
     }
 
     /// <summary>
-    /// 
+    /// 获得已注册国家Tag和国家版图颜色文件的路径
     /// </summary>
     /// <param name="gameRootPath"></param>
-    /// <returns>Key是国家Tag, Value是国家颜色绝对路径</returns>
+    /// <returns>Key是国家Tag, Value是国家颜色文件的绝对路径</returns>
     /// <exception cref="ParseException"></exception>
     public static Dictionary<CountryTag, string> GetCountriesColorFilePath(string gameRootPath)
     {

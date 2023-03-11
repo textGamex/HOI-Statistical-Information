@@ -13,7 +13,7 @@ namespace HOI_Message_UnitTest.Logic.Localisation
 
             Multiple(() =>
             {
-                That(() => { gameLocalisation.AddByFilePath("ErrorPath"); }, Throws.TypeOf<FileNotFoundException>());
+                That(() => { gameLocalisation.AddForFilePath("ErrorPath"); }, Throws.TypeOf<FileNotFoundException>());
             });
         }
 

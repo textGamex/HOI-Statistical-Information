@@ -3,7 +3,7 @@ using System.Text;
 
 namespace HOI_Message.Logic;
 
-public readonly struct CountryTag : IEquatable<CountryTag>
+public readonly struct CountryTag : IEquatable<CountryTag>, IEquatable<string>
 {
     public static readonly CountryTag Empty = new(new string(' ', 3));
 
@@ -61,6 +61,23 @@ public readonly struct CountryTag : IEquatable<CountryTag>
         return tag._first == _first && 
                tag._second == _second && 
                tag._last == _last;
+    }
+
+    public bool Equals(string? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (other.Length != 3)
+        {
+            return false;
+        }
+
+        return _first == other[0] &&
+               _second == other[1] &&
+               _last == other[2];
     }
 
     public override bool Equals(object? obj)
