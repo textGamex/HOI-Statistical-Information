@@ -2,7 +2,9 @@
 using System.Text;
 using CWTools.CSharp;
 using CWTools.Parser;
+using CWTools.Process;
 using FParsec;
+using Microsoft.FSharp.Collections;
 using static CWTools.Parser.CKParser;
 using static CWTools.Process.CK2Process;
 
@@ -13,10 +15,10 @@ namespace HOI_Message.Logic.Util.CWTool;
 /// </summary>
 public class CWToolsAdapter
 {
-    public EventRoot Root { get; }
+    public Node Root { get; }
     public bool IsSuccess { get; }
-
-    public string ErrorMessage { get; }
+    public ParserError Error { get; }
+    public string ErrorMessage => Error.ErrorMessage;
 
     static CWToolsAdapter()
     {
@@ -24,29 +26,21 @@ public class CWToolsAdapter
     }
 
     /// <summary>
-    /// 根据路径解析文件
+    /// 根据文件路径解析文件
     /// </summary>
     /// <param name="filePath">文件绝对路径</param>
     /// <exception cref="FileNotFoundException">当文件不存在时</exception>
     public CWToolsAdapter(string filePath) 
-        : this(File.Exists(filePath) ? parseEventFile(filePath) : throw new FileNotFoundException($"{filePath} 不存在", filePath))
+        : this(Path.GetFileName(filePath), filePath, File.Exists(filePath) 
+            ? Parsers.ParseScriptFile(Path.GetFileName(filePath), File.ReadAllText(filePath)) 
+            : throw new FileNotFoundException($"{filePath} 不存在", filePath))
     {
     }
 
-    /// <summary>
-    /// 根据文件内容和文件名称创建对象
-    /// </summary>
-    /// <param name="fileName">文件名</param>
-    /// <param name="text">文件内容</param>
-    public CWToolsAdapter(string fileName, string text) 
-        : this(parseEventString(text, fileName))
+    private CWToolsAdapter(string fileName, string filePath, CharParsers.ParserResult<FSharpList<Types.Statement>, Microsoft.FSharp.Core.Unit> node)
     {
-    }
-
-    private CWToolsAdapter(CharParsers.ParserResult<Types.ParsedFile, Microsoft.FSharp.Core.Unit> eventRoot)
-    {
-        Root = eventRoot.IsSuccess ? processEventFile(eventRoot.GetResult()) : new EventRoot(string.Empty, null);
-        IsSuccess = eventRoot.IsSuccess;
-        ErrorMessage = eventRoot.GetError();
+        Root = node.IsSuccess ? Parsers.ProcessStatements(fileName, filePath, node.GetResult()) : new Node(string.Empty);
+        IsSuccess = node.IsSuccess;
+        Error = node.GetError();
     }
 }

@@ -178,7 +178,7 @@ public partial class NationalInfo
 
             if (root.Root.Has("dynamic_tags"))
             {
-                if (root.Root.Leafs("dynamic_tags").First().Value.ToRawString() == "yes")
+                if (root.Root.Leafs("dynamic_tags").First().ValueText == "yes")
                 {
                     continue;
                 }
@@ -186,7 +186,7 @@ public partial class NationalInfo
 
             foreach (var leaf in root.Root.Leaves)
             {
-                var paths = leaf.Value.ToRawString().Split('/');
+                var paths = leaf.ValueText.Split('/');
                 map[new CountryTag(leaf.Key)] = Path.Combine(gameRootPath, Common, paths[0], paths[1]);
             }
         }

@@ -5,14 +5,7 @@ namespace HOI_Message_UnitTest.Logic.CWTools
     [TestFixture]
     public class CWToolsAdapterTests
     {
-        private const string TestText = """
-            key1 = testValue
-            key2 = { value1 value2 1 2 }
-            key3 = {
-                key3-1 = value
-            }
-            """;
-        private readonly CWToolsAdapter _adapter = new("test.txt", TestText);
+        private readonly CWToolsAdapter _adapter = new("Resources\\GameFile\\testText1.txt");
 
         [Test]
         public void KeyTest()

@@ -82,7 +82,7 @@ public class CountryFileParser
     {
     }
 
-    private static string TryGetOOBName(CWTools.Process.CK2Process.EventRoot root)
+    private static string TryGetOOBName(CWTools.Process.Node root)
     {
         if (root.Has(Key.OOB))
         {

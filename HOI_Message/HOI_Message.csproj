@@ -16,7 +16,7 @@
     <None Remove="Resources\Image\WorldIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CWTools" Version="0.3.0" />
+    <PackageReference Include="CWTools" Version="0.4.0-alpha4" />
     <PackageReference Include="FSharp.Core" Version="7.0.200" />
     <PackageReference Include="HandyControl" Version="3.4.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

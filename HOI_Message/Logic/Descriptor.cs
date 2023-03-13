@@ -17,13 +17,19 @@ public partial class Descriptor
     public string SupportedVersion { get; } = string.Empty;
     public string Version { get; } = string.Empty;
 
-    public IEnumerable<string> Tags { get; } = Enumerable.Empty<string>();
+    public IEnumerable<string> Tags { get; }
 
     public string PictureName { get; } = string.Empty;
 
-    public Descriptor(string fileName, string text)
+    /// <summary>
+    /// 按文件绝对路径构建
+    /// </summary>
+    /// <param name="modDescriptorPath">mod描述文件绝对路径</param>
+    /// <exception cref="ParseException">当文件解析失败时</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
+    public Descriptor(string modDescriptorPath)
     {
-        var root = new CWToolsAdapter(fileName, text);
+        var root = new CWToolsAdapter(modDescriptorPath);
         if (!root.IsSuccess)
         {
             throw new ParseException($"无法解析 descriptor.mod 文件, 错误信息: {root.ErrorMessage}");
@@ -33,52 +39,37 @@ public partial class Descriptor
 
         foreach (var item in result)
         {
-            if (item.Key == Key.SupportedVersion)
+            switch (item.Key)
             {
-                SupportedVersion = item.Value.ToRawString();
-            }
-
-            if (item.Key == Key.Picture)
-            {
-                PictureName = item.Value.ToRawString();
-            }
-
-            if (item.Key == Key.Version)
-            {
-                Version = item.Value.ToRawString();
+                case Key.Name:
+                    Name = item.ValueText;
+                    break;
+                case Key.SupportedVersion:
+                    SupportedVersion = item.ValueText;
+                    break;
+                case Key.Picture:
+                    PictureName = item.ValueText;
+                    break;
+                case Key.Version:
+                    Version = item.ValueText;
+                    break;
             }
         }
-
-        SetModName(text);
 
         if (root.Root.Has(Key.Tags))
         {
             var tags = root.Root.Child(Key.Tags).Value;
             Tags = tags.LeafValues.Select(x => x.Key);
         }
+        else
+        {
+            Tags = Enumerable.Empty<string>();
+        }
     }
-
-    /// <summary>
-    /// 按文件绝对路径构建
-    /// </summary>
-    /// <param name="modDescriptorPath">mod描述文件绝对路径</param>
-    /// <exception cref="ParseException">当文件解析失败时</exception>
-    /// <exception cref="FileNotFoundException">当文件不存在时</exception>
-    public Descriptor(string modDescriptorPath) : this("descriptor.mod", File.ReadAllText(modDescriptorPath))
-    {
-    }
-
-    private void SetModName(string fileText)
-    {
-        var result = NameRegex().Match(fileText);
-        Name = result.Value;
-    }
-
-    [GeneratedRegex("(?<=name.*=.*\").*(?=\")", RegexOptions.Compiled)]
-    private static partial Regex NameRegex();
-
+    
     private static class Key
     {
+        public const string Name = "name";
         public const string SupportedVersion = "supported_version";
         public const string Version = "version";
         public const string Picture = "picture";
