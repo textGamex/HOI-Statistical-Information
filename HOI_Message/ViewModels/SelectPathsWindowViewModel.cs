@@ -179,7 +179,7 @@ namespace HOI_Message.ViewModels
 
             foreach (var file in files)
             {
-                _localisation.AddByFilePath(file.FullName);
+                _localisation.AddForFilePath(file.FullName);
                 ++count;
 
                 //刷新进度条

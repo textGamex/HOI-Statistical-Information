@@ -15,7 +15,7 @@ public sealed class GameLocalisation
         _datas = new Dictionary<string, LineData>();
     }
 
-    public void AddByFilePath(string filePath)
+    public void AddForFilePath(string filePath)
     {
         if (!File.Exists(filePath))
         {
